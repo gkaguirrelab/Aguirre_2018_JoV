@@ -4,7 +4,7 @@
 		"hook": "",
 		"importance": "",
 		"localHookTemplate": "configuration/Aguirre_2018_JoVLocalHook",
-		"name": "Barnett_2018_PLoSCompBio",
+		"name": "Aguirre_2018_JoV",
 		"pathPlacement": "append",
 		"subfolder": "code",
 		"toolboxRoot": "",
