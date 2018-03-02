@@ -48,7 +48,7 @@ pbaspect([.25 1 1])
 % Plot the bivariate normal distribution
 D = diag([refractionHistFit.c1 axialLengthHistFit.c1]);
 covMatrix = D*[1.0 p; p 1.0]*D;
-S = D*corrMatrix*D;
+S = D*[1.0 p; p 1.0]*D;
 c = [refractionHistFit.c1 axialLengthHistFit.c1];
 
 subplot(2,2,3)

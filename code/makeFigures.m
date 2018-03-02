@@ -1,27 +1,21 @@
 %% Create figures for Aguirre & Frazzetta 2018
-%
-%
 
 
-if false
-    
-    %% Ray tracing through the cornea
-    corneaRayTrace
-    saveThatSucker('corneaRayTrace.pdf');
-    
-    %% Ellipse sets for different scene geometries
-    sceneGeomErrorInEllipseFitting
-    saveThatSucker('sceneGeomErrorInEllipseFitting.pdf');
-    
-    %% Errors in estimation of verdical camera translation
-    estimateSceneGeomVeridicalSim
-    saveThatSucker('estimateSceneGeomVeridicalSim.pdf');
-    
-    %% Simulate Mathur 2013 results
-    TEST_entrancePupilShape
-    saveThatSucker('mathur2013simulation.pdf');
-    
-end
+%% Ray tracing through the cornea
+corneaRayTrace
+saveThatSucker('corneaRayTrace.pdf');
+
+%% Ellipse sets for different scene geometries
+sceneGeomErrorInEllipseFitting
+saveThatSucker('sceneGeomErrorInEllipseFitting.pdf');
+
+%% Errors in estimation of verdical camera translation
+estimateSceneGeomVeridicalSim
+saveThatSucker('estimateSceneGeomVeridicalSim.pdf');
+
+%% Simulate Mathur 2013 results
+TEST_entrancePupilShape
+saveThatSucker('mathur2013simulation.pdf');
 
 %% Replot Helsinki study data (Olsen 2007)
 % see TEST_estimateCameraTranslation for details
