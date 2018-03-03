@@ -11,18 +11,20 @@ rayTraceFuncs = assembleRayTraceFuncs( sceneGeometry );
 
 %% Define some variables
 pupilRadiusMM = 2;
-
-figure
+nAzi = 6;
+nEle = 6;
+translationError1SD = 6.1866;
+translationError2SD = 10.7749;
 
 %% Loop over aimuths and elevations to create pupil border points
 % The range of values used here corresponds to the biological limits of the
 % rotation of the eye horizontally and vertically.
 thisTorsion = 0;
-for aziIdx = 1:15
-    for eleIdx = 1:11
+for aziIdx = 1:nAzi
+    for eleIdx = 1:nEle
         
-        thisAzimuth = (aziIdx-8)*5;
-        thisElevation = (eleIdx-6)*5;
+        thisAzimuth = (aziIdx-1)*5;
+        thisElevation = (eleIdx-1)*5;
         thisTorsion = 0;
         
         % Assemble the eyePoses variable
@@ -37,55 +39,49 @@ for aziIdx = 1:15
     end
 end
 
-%% Plot the variation in ellipse area on the image plane
-subplot(4,3,3)
-image = (pupilEllipseAreas./pupilEllipseAreas(8,6))';
-plotMatrix(image, [0.8 1],'proportion max area');
 
+%% Create scene geometries with +1 and +2SD of camera depth error
+sceneGeometry1SDerror = sceneGeometry;
+sceneGeometry1SDerror.extrinsicTranslationVector(3) = 120 + translationError1SD;
+rayTraceFuncs1SDerror = assembleRayTraceFuncs( sceneGeometry1SDerror );
+sceneGeometry2SDerror = sceneGeometry;
+sceneGeometry2SDerror.extrinsicTranslationVector(3) = 120 + translationError2SD;
+rayTraceFuncs2SDerror = assembleRayTraceFuncs( sceneGeometry2SDerror );
 
-%% Calculate the error without ray tracing
-for aziIdx = 1:15
-    for eleIdx = 1:11
-        
-        inverseEyePose = eyePoseEllipseFit(squeeze(Xp(aziIdx,eleIdx,:)), squeeze(Yp(aziIdx,eleIdx,:)), sceneGeometry, [],'eyePoseLB',[-40,-35,0,0.5],'eyePoseUB',[40,35,0,4]);
-        
-        eyePoseErrors(aziIdx,eleIdx,:) = inverseEyePose-squeeze(eyePoses(aziIdx, eleIdx, :))';
+%% Find the inverse eye pose solutions
+for aziIdx = 1:nAzi
+    for eleIdx = 1:nEle
+        inverseEyePose1SDerror(aziIdx,eleIdx,:) = eyePoseEllipseFit(squeeze(Xp(aziIdx,eleIdx,:)), squeeze(Yp(aziIdx,eleIdx,:)), sceneGeometry1SDerror, rayTraceFuncs1SDerror,'eyePoseLB',[-50,-45,0,0.5],'eyePoseUB',[50,45,0,4]);
+        inverseEyePose2SDerror(aziIdx,eleIdx,:) = eyePoseEllipseFit(squeeze(Xp(aziIdx,eleIdx,:)), squeeze(Yp(aziIdx,eleIdx,:)), sceneGeometry2SDerror, rayTraceFuncs2SDerror,'eyePoseLB',[-50,-45,0,0.5],'eyePoseUB',[50,45,0,4]);
     end
 end
 
-idxToPlot = [1,2,4];
-cBarRange = [-5 5; -5 5; 0 0.5];
-titleStrings = {'azi','ele (no ray trace)','radius'};
-for pp = 1:3
-    subplot(4,3,pp+3)
-    image = eyePoseErrors(:,:,idxToPlot(pp))';
-    plotMatrix(image, cBarRange(pp,:), titleStrings{pp});
-end
+%% Reshape the eye poses into lists suitable for quivering
+veridicalAziList = reshape(eyePoses(:,:,1),nAzi*nEle,1);
+veridicalEleList = reshape(eyePoses(:,:,2),nAzi*nEle,1);
+inverseAziList1SDerror = reshape(inverseEyePose1SDerror(:,:,1),nAzi*nEle,1);
+inverseEleList1SDerror = reshape(inverseEyePose1SDerror(:,:,2),nAzi*nEle,1);
+inverseAziList2SDerror = reshape(inverseEyePose2SDerror(:,:,1),nAzi*nEle,1);
+inverseEleList2SDerror = reshape(inverseEyePose2SDerror(:,:,2),nAzi*nEle,1);
 
+figure
 
-%% Calculate the error with 1SD worth of camera depth error
-
-
-
-%% Local plot function
-function plotMatrix(image, cBarRange, titleString)
-[nr,nc] = size(image);
-pcolor([image nan(nr,1); nan(1,nc+1)]);
-shading flat;
+%% Quiver
+subplot(2,1,1)
+quiver(veridicalAziList,veridicalEleList,inverseAziList2SDerror,inverseEleList2SDerror,'-r');
+hold on
+q=quiver(veridicalAziList,veridicalEleList,inverseAziList1SDerror,inverseEleList1SDerror);
+q.Color = [1 0.4 0.6];
+plot(veridicalAziList,veridicalEleList,'.k');
 axis equal
-% Set the axis backgroud to dark gray
-set(gcf,'Color',[1 1 1]); set(gca,'Color',[.75 .75 .75]); set(gcf,'InvertHardCopy','off');
-colorbar;
-xticks((1:1:size(image,2))+.5);
-xticklabels(-35:5:35);
-xtickangle(90);
-yticks((1:1:size(image,1))+.5);
-yticklabels(-25:5:25);
-xlim([1 size(image,2)+1]);
-ylim([1 size(image,1)+1]);
-xlabel('veridical azimuth [deg]')
-ylabel('veridical elevation [deg]')
-caxis(cBarRange);
-title(titleString);
 
-end
+%% Circle
+veridicalRadii = ones(nAzi*nEle,1)*pupilRadiusMM;
+inverseRadii1SDerror = reshape(inverseEyePose1SDerror(:,:,4),nAzi*nEle,1);
+inverseRadii2SDerror = reshape(inverseEyePose2SDerror(:,:,4),nAzi*nEle,1);
+subplot(2,1,2)
+viscircles([veridicalAziList veridicalEleList],inverseRadii2SDerror,'Color',[1 0 0],'LineWidth',0.5);
+hold on
+viscircles([veridicalAziList veridicalEleList],inverseRadii1SDerror,'Color',[1 0.5 0.5],'LineWidth',0.5);
+viscircles([veridicalAziList veridicalEleList],veridicalRadii,'Color',[.5 .5 .5],'LineWidth',0.5);
+axis equal;
