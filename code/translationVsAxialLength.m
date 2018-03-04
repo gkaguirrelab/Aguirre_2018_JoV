@@ -1,7 +1,7 @@
 %% translationVsAxialLength
 
 axialLengths = [21.72, 22.65, 23.59, 24.53, 25.47];
-resultFileStem = '~/Dropbox (Aguirre-Brainard Lab)/Apps/CfNUploader/TEST_estimateCameraTranslation/TEST_estimateCameraTranslation/sceneGeometry_result)axialLength=';
+resultFileStem = '~/Dropbox (Aguirre-Brainard Lab)/Apps/CfNUploader/TEST_estimateCameraTranslation/TEST_estimateCameraTranslation/sceneGeometry_result_axialLength=';
 
 figure
 subplot(2,1,1);
