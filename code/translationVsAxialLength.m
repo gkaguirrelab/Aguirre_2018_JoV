@@ -18,16 +18,20 @@ for ii = 1:length(axialLengths)
 end
 errorbar(axialLengths,y,err,'.')
 hold on
-plot(axialLengths, pLBs);
-plot(axialLengths, pUBs);
+plot(axialLengths,f(axialLengths))
+% Add a linear fit and R2
+[f, gof] = fit(axialLengths',y','poly1');
+plot(axialLengths,f(axialLengths),'-r')
+
 xlim([20 27]);
-ylim([80 180]);
+ylim([pLBs(1) pUBs(1)]);
 xlabel('Veridical eye axial length [mm]');
 ylabel('Estimated camera depth [mm]');
+title(['Axial eye length error vs. camera depth. R2 = '  num2str(gof.rsquare)]);
 
 subplot(2,1,2);
-semilogy(axialLengths,medianFvals,'.-')
+plot(axialLengths,minFvals,'.-');
 xlim([20 27]);
-ylim([8e-5 9e-5]);
+ylim([1e-5 1e-4]);
 xlabel('Veridical eye axial length [mm]');
-ylabel('median fVal [RMSE]');
+ylabel('min fVal [RMSE]');
