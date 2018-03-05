@@ -25,7 +25,7 @@ sceneGeometryVeridical_1SDcase = createSceneGeometry('axialLength',23.5924+condi
 rayTraceFuncsVeridical_1SDcase = assembleRayTraceFuncs( sceneGeometryVeridical_1SDcase );
 
 sceneGeometryVeridical_2SDcase = createSceneGeometry('axialLength',23.5924+conditionalSigmaLength*2);
-rayTraceFuncsVeridical_2SDcase = assembleRayTraceFuncs( sceneGeometryVeridical_1SDcase );
+rayTraceFuncsVeridical_2SDcase = assembleRayTraceFuncs( sceneGeometryVeridical_2SDcase );
 
 %% Loop over aimuths and elevations to create pupil border points
 % The range of values used here corresponds to the biological limits of the
@@ -68,8 +68,8 @@ rayTraceFuncsModeled_2SDcase = assembleRayTraceFuncs( sceneGeometryModeled_2Scas
 % Loop through the eye poses and obtain the inverse solutions
 for aziIdx = 1:nAzi
     for eleIdx = 1:nEle
-        inverseEyePose_1SDcase(aziIdx,eleIdx,:) = eyePoseEllipseFit(squeeze(Xp_1SDcase(aziIdx,eleIdx,:)), squeeze(Xp_1SDcase(aziIdx,eleIdx,:)), sceneGeometryModeled_1Scase, rayTraceFuncsModeled_1SDcase,'eyePoseLB',[-50,-45,0,0.5],'eyePoseUB',[50,45,0,4]);
-        inverseEyePose_2SDcase(aziIdx,eleIdx,:) = eyePoseEllipseFit(squeeze(Xp_2SDcase(aziIdx,eleIdx,:)), squeeze(Xp_2SDcase(aziIdx,eleIdx,:)), sceneGeometryModeled_2Scase, rayTraceFuncsModeled_1SDcase,'eyePoseLB',[-50,-45,0,0.5],'eyePoseUB',[50,45,0,4]);
+        inverseEyePose_1SDcase(aziIdx,eleIdx,:) = eyePoseEllipseFit(squeeze(Xp_1SDcase(aziIdx,eleIdx,:)), squeeze(Yp_1SDcase(aziIdx,eleIdx,:)), sceneGeometryModeled_1Scase, rayTraceFuncsModeled_1SDcase,'eyePoseLB',[-50,-45,0,0.5],'eyePoseUB',[50,45,0,4]);
+        inverseEyePose_2SDcase(aziIdx,eleIdx,:) = eyePoseEllipseFit(squeeze(Xp_2SDcase(aziIdx,eleIdx,:)), squeeze(Yp_2SDcase(aziIdx,eleIdx,:)), sceneGeometryModeled_2Scase, rayTraceFuncsModeled_1SDcase,'eyePoseLB',[-50,-45,0,0.5],'eyePoseUB',[50,45,0,4]);
     end
 end
 
@@ -100,23 +100,27 @@ hV2 = get(h2,'VData');
 set(h2,'UData',scale*hU2,'VData',scale*hV2)
 hold on
 plot(veridicalAziList,veridicalEleList,'.k');
-xlim([-5 30]);
-ylim([-5 30]);
+xlim([-5 35]);
+ylim([-5 35]);
 axis square
 titleString=sprintf('Max error 1D, 2D Azi = %4.2f, %4.2f; Ele = %4.2f, %4.2f',max(inverseAziList_1SDcase),max(inverseAziList_2SDcase),max(inverseEleList_1SDcase),max(inverseEleList_2SDcase));
 title(titleString);
 
 %% Circle
 veridicalRadii = ones(nAzi*nEle,1)*pupilRadiusMM;
-inverseRadii1SDerror = reshape(inverseEyePose_1SDcase(:,:,4),nAzi*nEle,1)-veridicalRadii;
-inverseRadii2SDerror = reshape(inverseEyePose_2SDcase(:,:,4),nAzi*nEle,1)-veridicalRadii;
+inverseRadii_1SDcase = reshape(inverseEyePose_1SDcase(:,:,4),nAzi*nEle,1)-veridicalRadii;
+inverseRadii_2SDcase = reshape(inverseEyePose_2SDcase(:,:,4),nAzi*nEle,1)-veridicalRadii;
 subplot(1,2,2)
-viscircles([veridicalAziList veridicalEleList],inverseRadii2SDerror*10,'Color',[1 0.5 0.5],'LineWidth',0.5);
+viscircles([veridicalAziList veridicalEleList],inverseRadii_2SDcase*10,'Color',[1 0.5 0.5],'LineWidth',0.5);
 hold on
-viscircles([veridicalAziList veridicalEleList],inverseRadii1SDerror*10,'Color',[.75 0.75 0.75],'LineWidth',0.5);
+viscircles([veridicalAziList veridicalEleList],inverseRadii_1SDcase*10,'Color',[.75 0.75 0.75],'LineWidth',0.5);
 plot(veridicalAziList,veridicalEleList,'.k');
-xlim([-5 30]);
-ylim([-5 30]);
+xlim([-5 35]);
+ylim([-5 35]);
 axis square;
-titleString=sprintf('Error 1D, 2D Min = %4.2f, %4.2f; Max = %4.2f, %4.2f',min(inverseRadii1SDerror),min(inverseRadii2SDerror),max(inverseRadii1SDerror),max(inverseRadii2SDerror));
+titleString=sprintf('Error 1D, 2D Min = %4.2f, %4.2f; Max = %4.2f, %4.2f',min(inverseRadii_1SDcase),min(inverseRadii_2SDcase),max(inverseRadii_1SDcase),max(inverseRadii_2SDcase));
 title(titleString);
+
+%% Dump some numbers
+fprintf('1SD case, median proportion error in [Azi, Ele, radius]: %4.2f, %4.2f, %4.2f \n',median(inverseAziList_1SDcase./veridicalAziList),median(inverseEleList_1SDcase./veridicalEleList),median(inverseRadii_1SDcase./veridicalRadii));
+fprintf('2SD case, median proportion error in [Azi, Ele, radius]: %4.2f, %4.2f, %4.2f \n',median(inverseAziList_2SDcase./veridicalAziList),median(inverseEleList_2SDcase./veridicalEleList),median(inverseRadii_2SDcase./veridicalRadii));

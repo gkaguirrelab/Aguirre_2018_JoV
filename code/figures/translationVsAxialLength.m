@@ -18,7 +18,6 @@ for ii = 1:length(axialLengths)
 end
 errorbar(axialLengths,y,err,'.')
 hold on
-plot(axialLengths,f(axialLengths))
 % Add a linear fit and R2
 [f, gof] = fit(axialLengths',y','poly1');
 plot(axialLengths,f(axialLengths),'-r')
