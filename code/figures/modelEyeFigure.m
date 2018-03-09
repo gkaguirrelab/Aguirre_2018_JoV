@@ -1,5 +1,7 @@
 %% modelEyeFigure
 
+clear all
+
 figure
 subplot(1,2,1)
 modelEyeAxialSchematic
