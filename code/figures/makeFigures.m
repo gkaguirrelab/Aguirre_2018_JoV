@@ -30,6 +30,9 @@ saveThatSucker('translationVsAxialLength.pdf');
 eyeposeQuantificationError
 saveThatSucker('eyeposeQuantificationError.pdf');
 
+%% modelEyeFigure
+modelEyeFigure
+saveThatSucker('modelEyeFigure.pdf');
 
 
 
