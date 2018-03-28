@@ -27,13 +27,13 @@ plotHyperbola(ep,[0.5 0.5 0.5])
 %% Add the pupil center, 2mm radius pupil, center of rotation, iris boundary
 plot([eye.pupilCenter(1) eye.pupilCenter(1)],[-2 2],'-k');
 plot(eye.pupilCenter(1),eye.pupilCenter(2),'*r')
-plot(eye.rotationCenters.azi(1),eye.rotationCenters.azi(2),'+g')
-plot(eye.rotationCenters.ele(1),eye.rotationCenters.ele(2),'+y')
+plot(eye.rotationCenters.azi(1),eye.rotationCenters.azi(2),'>g')
+plot(eye.rotationCenters.ele(1),eye.rotationCenters.ele(2),'^y')
 plot(eye.irisCenter(1),eye.irisCenter(2)+eye.irisRadius,'xb')
 plot(eye.irisCenter(1),eye.irisCenter(2)-eye.irisRadius,'xb')
 
 %% Find the coordinates of the corneal apex after rotating the eye by kappa(1)
-[~, ~, sceneWorldPoints, ~, pointLabels] = pupilProjection_fwd([eye.kappaAngle(1) 0 0 1], sceneGeometry, [], 'fullEyeModelFlag',true);
+[~, ~, sceneWorldPoints, ~, pointLabels] = pupilProjection_fwd([eye.kappaAngle(1) 0 0 1], sceneGeometry, 'fullEyeModelFlag',true);
 idx = find(strcmp(pointLabels,'cornealApex'));
 plot(sceneWorldPoints(idx,3),sceneWorldPoints(idx,1),'xy');
 

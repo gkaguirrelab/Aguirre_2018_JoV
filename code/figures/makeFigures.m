@@ -14,7 +14,7 @@ estimateSceneGeomVeridicalSim
 saveThatSucker('estimateSceneGeomVeridicalSim.pdf');
 
 %% Simulate Mathur 2013 results
-TEST_entrancePupilShape
+TEST_Mathur2013
 saveThatSucker('mathur2013simulation.pdf');
 
 %% Replot Helsinki study data (Olsen 2007)

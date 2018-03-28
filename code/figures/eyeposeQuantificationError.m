@@ -6,8 +6,8 @@ clearvars
 % createSceneGeometry returns a default sceneGeometry structure
 sceneGeometry = createSceneGeometry();
 
-%% Obtain the ray tracing functions
-rayTraceFuncs = assembleRayTraceFuncs( sceneGeometry );
+%% Compile the ray tracing functions
+sceneGeometry.virtualImageFunc = compileVirtualImageFunc(sceneGeometry);
 
 %% Define some variables
 pupilRadiusMM = 2;
