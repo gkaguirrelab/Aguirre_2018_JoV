@@ -1,5 +1,10 @@
 function [diamRatio, theta, pupilFitError] = returnPupilDiameterRatio(viewingAngleDeg,pupilDiam,sceneGeometry)
 
+% Setup the camera position and rotation properties
+sceneGeometry.cameraExtrinsic.translation = [0; 0; 100];
+sceneGeometry.eye.rotationCenters.azi = [0 0 0];
+sceneGeometry.eye.rotationCenters.ele = [0 0 0];
+
 % Our model rotates the eye. For the right eye, a positive azimuth rotates
 % the eye such that the center of the pupil moves to the right of the
 % image. This means that a positive azimuth corresponds to the camera being
