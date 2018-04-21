@@ -1,4 +1,4 @@
-function [diamRatio, theta, pupilFitError] = returnPupilDiameterRatio(viewingAngleDeg,pupilDiam,sceneGeometry)
+function [diamRatio, C, pupilFitError] = returnPupilDiameterRatio(viewingAngleDeg,pupilDiam,sceneGeometry)
 
 % Setup the camera position and rotation properties
 sceneGeometry.cameraExtrinsic.translation = [0; 0; 100];
@@ -40,5 +40,15 @@ horizDiam =max(imagePoints(:,1)')-min(imagePoints(:,1)');
 vertDiam  =max(imagePoints(:,2)')-min(imagePoints(:,2)');
 theta = pupilEllipseOnImagePlane(5);
 diamRatio=horizDiam./vertDiam;
+
+% Reverse the theta to match the Mathur convention, in which a theta of
+% zero corresponds to a pupil ellipse with the major axis aligned with the
+% horizontal meridian, and positive values of theta are in the
+% counter-clockwise direction.
+theta = pi - theta;
+
+% Calculate the Mathur value C from Equation 6
+C = (1-diamRatio).*sin(2.*(theta-pi/2));
+
 
 end

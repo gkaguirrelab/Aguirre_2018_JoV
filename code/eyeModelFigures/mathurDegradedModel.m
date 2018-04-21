@@ -3,46 +3,71 @@
 % We examined how the mathur measures change as a function of removing
 % components of the model.
 
+% The range for our plots
+viewingAngleDeg = -70:1:70;
 
-viewingAngleDeg = -60:1:60;
+% The size of the exit pupil
 pupilDiam = 6.19/1.13;
 
-sceneGeometry = createSceneGeometry('axialLength',25.1340);
-for vv = 1:length(viewingAngleDeg)
+nModels = 4;
 
-    % Full model
-    [diamRatios(vv), thetas(vv)] = returnPupilDiameterRatio(viewingAngleDeg(vv),pupilDiam,sceneGeometry);
-
-    % No ray tracing
-    sg = sceneGeometry;
-    sg.refraction = [];
-    [diamRatios_noRayTrace(vv), thetas_noRayTrace(vv)] = returnPupilDiameterRatio(viewingAngleDeg(vv),pupilDiam,sg);
+clear diamRatios C
+for modelLevel = 1:nModels
+    switch modelLevel
+        case 1
+            sg = createSceneGeometry('axialLength',25.1340);
+            sg.refraction = [];
+            sg.eye.alpha = [0 0 0];
+            sg.eye.pupil.eccenFcnString = '@(x) 0';
+            sg.eye.pupil.thetas = [0 pi/2];
+        case 2
+            sg = createSceneGeometry('axialLength',25.1340);
+            sg.eye.alpha = [0 0 0];
+            sg.eye.pupil.eccenFcnString = '@(x) 0';
+            sg.eye.pupil.thetas = [0 pi/2];
+        case 3
+            sg = createSceneGeometry('axialLength',25.1340);
+            sg.eye.pupil.eccenFcnString = '@(x) 0';
+            sg.eye.pupil.thetas = [0 pi/2];
+        case 4
+            sg = createSceneGeometry('axialLength',25.1340);
+    end
+    for vv = 1:length(viewingAngleDeg)        
+        [diamRatios(modelLevel,vv), C(modelLevel,vv)] = returnPupilDiameterRatio(viewingAngleDeg(vv),pupilDiam,sg);
+    end
 end
- 
-% Reverse the thetas to match the Mathur convention, in which a theta of
-% zero corresponds to a pupil ellipse with the major axis aligned with the
-% horizontal meridian, and positive values of theta are in the
-% counter-clockwise direction.
-thetas = pi - thetas;
 
-% Calculate the Mathur value C from Equation 6
-C = (1-diamRatios).*sin(2.*(thetas-pi/2));
+% This is Eq 9 from Mathur 2013, which specifies the horizontal to vertical
+% ratio of the entrance pupil from different viewing angles relative to
+% fixation
+mathurEq9 = @(viewingAngleDeg) 0.99.*cosd((viewingAngleDeg+5.3)/1.121);
 
-% Plot Figure 10 of Mathur 2013 with our model output.
+% This is Eq 11, which specifies the oblique component of pupil ellipticity
+mathurEq11 = @(viewingAngleDeg) 0.00072.*viewingAngleDeg-0.0008;
+
+% Plot the results.
 figure
-subplot(1,2,1);
-plot(viewingAngleDeg,diamRatios ,'-k');
-xlim([-90 90]);
-ylim([0 1.1]);
-xlabel('Viewing angle [deg]')
-ylabel('Pupil Diameter Ratio')
-title('Mathur 2013 Figure 6, component A')
 
-subplot(1,2,2)
-plot(viewingAngleDeg,C ,'-k');
-hold on
-xlim([-90 90]);
-ylim([-.2 .2]);
-xlabel('Viewing angle [deg]')
-ylabel('Oblique component of the pupil ellipticity')
-title('Mathur 2013 Figure 6, component C')
+titleStrings = {'no model','add ray trace','add alpha','add non-circular exit pupil'};
+for modelLevel = 1:nModels
+    subplot(2,2,modelLevel);
+    hold on
+    plot(viewingAngleDeg,mathurEq9(viewingAngleDeg) ,'-','Color',[.5 .5 .5]);
+    plot(viewingAngleDeg,cosd(viewingAngleDeg),':','Color',[.5 .5 .5]);
+    plot(viewingAngleDeg,diamRatios(modelLevel,:),'-','Color',[1 0 0]);
+    RMSE = sqrt(mean((diamRatios(modelLevel,:)-mathurEq9(viewingAngleDeg)).^2));
+    text(0,0.6,sprintf('RMSE = %1.0e',RMSE),'HorizontalAlignment','Center');
+
+    plot(viewingAngleDeg,mathurEq11(viewingAngleDeg),'-','Color',[.5 .5 .5]);
+    plot(viewingAngleDeg,viewingAngleDeg.*0,':','Color',[.5 .5 .5]);
+    plot(viewingAngleDeg,C(modelLevel,:),'-','Color',[1 0 0]);
+    RMSE = sqrt(mean((C(modelLevel,:)-mathurEq11(viewingAngleDeg)).^2));
+    text(0,-0.1,sprintf('RMSE = %1.0e',RMSE),'HorizontalAlignment','Center');
+
+    axis square
+    xlim([-90 90]);
+    ylim([-.2 1.1]);
+    xlabel('Viewing angle [deg]')
+    ylabel('Pupil Diameter Ratio - obliquity')
+    title(titleStrings{modelLevel})
+end

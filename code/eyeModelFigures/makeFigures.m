@@ -9,9 +9,9 @@ saveThatSucker('modelEyeFigure.pdf');
 corneaRayTrace
 saveThatSucker('corneaRayTrace.pdf');
 
-%% Mathur 2013
-TEST_Mathur2013
-saveThatSucker('mathur2013.pdf');
+%% mathurDegradedModel
+mathurDegradedModel
+saveThatSucker('mathurDegradedModel.pdf');
 
 %% turningPointByAmetropia
 turningPointByAmetropia
@@ -20,3 +20,7 @@ saveThatSucker('turningPointByAmetropia.pdf');
 %% Tabernero 2007
 alphaByAxialLength
 saveThatSucker('alphaByAxialLength.pdf');
+
+%% olsen2007histogram
+olsen2007histogram
+saveThatSucker('olsen2007histogram.pdf');

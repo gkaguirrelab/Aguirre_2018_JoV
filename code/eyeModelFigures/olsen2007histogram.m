@@ -58,3 +58,13 @@ plot_gaussian_ellipsoid([refractionHistFit.b1 axialLengthHistFit.b1], S, diag(c)
 xlim([-15 15]);
 ylim([18 30]);
 axis square
+
+% Add the behavior of our model
+ametropias = -5:1:5;
+axialLength = [];
+for aa = 1:length(ametropias)
+    eye = modelEyeParameters('sphericalAmetropia',ametropias(aa));
+    axialLength(aa) = eye.axialLength;
+end
+
+plot(ametropias,axialLength,'-b')

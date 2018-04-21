@@ -49,7 +49,7 @@ viewingAngleDeg = -60:10:60;
 pupilDiam = 6.19/1.13;
 
 % Derive the axial length of the eye for each of several ametropia values
-ametropiaValues = -5:1:5;
+ametropiaValues = -7:1:7;
 
 axialLengths = [];
 for aa = 1:length(ametropiaValues)
@@ -57,8 +57,6 @@ for aa = 1:length(ametropiaValues)
     axialLengths = [axialLengths eye.axialLength];
 end
 
-% This is the +-SD value for axial length given the spherical ametropia.
-conditionalSigmaLength = 0.9384;
 
 % Mathur 2013 Equation 7. Used to fit the pupil diameter values and extract
 % the turning point (beta).
@@ -66,26 +64,26 @@ eq7 = fittype( @(beta,D,E,x) D.*cosd((x-beta)./E), 'independent','x','dependent'
 
 betas = [];
 for aa = 1:length(ametropiaValues)
-    for sd = -1:1:1
         % Obtain the turning point for the correct axial length
-        sceneGeometry = createSceneGeometry('axialLength',axialLengths(aa)+sd*conditionalSigmaLength);
+        sceneGeometry = createSceneGeometry('axialLength',axialLengths(aa));
         for vv = 1:length(viewingAngleDeg)
-            [diamRatio(vv), theta(vv), pupilFitError(vv)] = returnPupilDiameterRatio(viewingAngleDeg(vv),pupilDiam,sceneGeometry);
+            [diamRatio(vv), C(vv), pupilFitError(vv)] = returnPupilDiameterRatio(viewingAngleDeg(vv),pupilDiam,sceneGeometry);
         end
         f = fit (viewingAngleDeg',diamRatio',eq7,'StartPoint',[5.3,0.93,1.12]);
-        betas(aa,sd+2) = f.beta;
-    end
+        betas(aa) = f.beta;
 end
 
 % Plot the mathur data
-plot(mathurData(1,:),mathurData(2,:),'ok','MarkerSize',14);
+plot(mathurData(1,:),mathurData(2,:),'ok','MarkerSize',10);
 hold on
+xlim([-5 2.5]);
+ylim([-10 0]);
+xlabel('Refraction [D]');
+ylabel('Turning point beta [deg]');
 
 % Plot our model
-plot(ametropiaValues,betas(:,1),'-.r')
-plot(ametropiaValues,betas(:,2),'-r')
-plot(ametropiaValues,betas(:,3),'-.r')
+plot(ametropiaValues,betas,'-r')
 
 % Plot their fit to the data
 mathurFit = @(x) -5.8 - 0.61*x;
-plot(ametropiaValues,mathurFit(ametropiaValues),'-.k')
+plot(ametropiaValues,mathurFit(ametropiaValues),'-k')
