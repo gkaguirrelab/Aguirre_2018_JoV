@@ -25,12 +25,20 @@ plot(hashemiData(1,:),hashemiData(2,:),'or');
 plot(taberneroData(1,:),taberneroData(2,:),'ob');
 
 % Add our model fit
-
 sphericalAmetropias = -15:1:5;
 for aa = 1:length(sphericalAmetropias)
     eye = modelEyeParameters('sphericalAmetropia',sphericalAmetropias(aa));
     alphaAzi(aa)= eye.alpha(1);
     alphaEle(aa)= eye.alpha(2);
 end
-
 plot(sphericalAmetropias,alphaAzi,'-r')
+
+% Add the Tabernero model
+for aa = 1:length(sphericalAmetropias)
+    % This retinal fovea angle yields an azimuth alpha of 5 deg in the
+    % emmetropic eye, matching the Tabernero model
+    eye = modelEyeParameters('sphericalAmetropia',sphericalAmetropias(aa),'foveaAngle',[7.015 0 0]);
+    alphaAzi(aa)= eye.alpha(1);
+    alphaEle(aa)= eye.alpha(2);
+end
+plot(sphericalAmetropias,alphaAzi,':b')

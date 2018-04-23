@@ -17,10 +17,6 @@ saveThatSucker('mathurDegradedModel.pdf');
 turningPointByAmetropia
 saveThatSucker('turningPointByAmetropia.pdf');
 
-%% Tabernero 2007
-alphaByAxialLength
-saveThatSucker('alphaByAxialLength.pdf');
-
 %% alphaByAmetropia
 alphaByAmetropia
 saveThatSucker('alphaByAmetropia.pdf');
