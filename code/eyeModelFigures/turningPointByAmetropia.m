@@ -71,6 +71,7 @@ for aa = 1:length(ametropiaValues)
         end
         f = fit (viewingAngleDeg',diamRatio',eq7,'StartPoint',[5.3,0.93,1.12]);
         betas(aa) = f.beta;
+        alphas(aa) = sceneGeometry.eye.alpha(1);
 end
 
 % Plot the mathur data

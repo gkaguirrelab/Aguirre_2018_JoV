@@ -21,6 +21,7 @@ saveThatSucker('turningPointByAmetropia.pdf');
 alphaByAxialLength
 saveThatSucker('alphaByAxialLength.pdf');
 
-%% olsen2007histogram
-olsen2007histogram
-saveThatSucker('olsen2007histogram.pdf');
+%% alphaByAmetropia
+alphaByAmetropia
+saveThatSucker('alphaByAmetropia.pdf');
+

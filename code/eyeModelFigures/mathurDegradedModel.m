@@ -9,28 +9,30 @@ viewingAngleDeg = -70:1:70;
 % The size of the exit pupil
 pupilDiam = 6.19/1.13;
 
+axialLength = 23.7268;
+
 nModels = 4;
 
 clear diamRatios C
 for modelLevel = 1:nModels
     switch modelLevel
         case 1
-            sg = createSceneGeometry('axialLength',25.1340);
+            sg = createSceneGeometry('axialLength',axialLength);
             sg.refraction = [];
             sg.eye.alpha = [0 0 0];
             sg.eye.pupil.eccenFcnString = '@(x) 0';
             sg.eye.pupil.thetas = [0 pi/2];
         case 2
-            sg = createSceneGeometry('axialLength',25.1340);
+            sg = createSceneGeometry('axialLength',axialLength);
             sg.eye.alpha = [0 0 0];
             sg.eye.pupil.eccenFcnString = '@(x) 0';
             sg.eye.pupil.thetas = [0 pi/2];
         case 3
-            sg = createSceneGeometry('axialLength',25.1340);
+            sg = createSceneGeometry('axialLength',axialLength);
             sg.eye.pupil.eccenFcnString = '@(x) 0';
             sg.eye.pupil.thetas = [0 pi/2];
         case 4
-            sg = createSceneGeometry('axialLength',25.1340);
+            sg = createSceneGeometry('axialLength',axialLength);
     end
     for vv = 1:length(viewingAngleDeg)        
         [diamRatios(modelLevel,vv), C(modelLevel,vv)] = returnPupilDiameterRatio(viewingAngleDeg(vv),pupilDiam,sg);
