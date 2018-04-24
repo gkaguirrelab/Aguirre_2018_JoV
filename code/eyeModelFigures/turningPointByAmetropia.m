@@ -51,13 +51,6 @@ pupilDiam = 6.19/1.13;
 % Derive the axial length of the eye for each of several ametropia values
 ametropiaValues = -7:1:7;
 
-axialLengths = [];
-for aa = 1:length(ametropiaValues)
-    eye = modelEyeParameters('sphericalAmetropia',ametropiaValues(aa));
-    axialLengths = [axialLengths eye.axialLength];
-end
-
-
 % Mathur 2013 Equation 7. Used to fit the pupil diameter values and extract
 % the turning point (beta).
 eq7 = fittype( @(beta,D,E,x) D.*cosd((x-beta)./E), 'independent','x','dependent','y');
@@ -65,13 +58,13 @@ eq7 = fittype( @(beta,D,E,x) D.*cosd((x-beta)./E), 'independent','x','dependent'
 betas = [];
 for aa = 1:length(ametropiaValues)
         % Obtain the turning point for the correct axial length
-        sceneGeometry = createSceneGeometry('axialLength',axialLengths(aa));
+        sceneGeometry = createSceneGeometry('sphericalAmetropia',ametropiaValues(aa));
         for vv = 1:length(viewingAngleDeg)
             [diamRatio(vv), C(vv), pupilFitError(vv)] = returnPupilDiameterRatio(viewingAngleDeg(vv),pupilDiam,sceneGeometry);
         end
         f = fit (viewingAngleDeg',diamRatio',eq7,'StartPoint',[5.3,0.93,1.12]);
         betas(aa) = f.beta;
-        alphas(aa) = sceneGeometry.eye.alpha(1);
+        alphas(aa) = sceneGeometry.eye.axes.alpha.degField(1);
 end
 
 % Plot the mathur data

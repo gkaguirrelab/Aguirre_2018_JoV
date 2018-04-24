@@ -15,8 +15,8 @@ sceneGeometry.eye.rotationCenters.ele = [0 0 0];
 % the eye. The coordinates of our model eye are based around the pupil
 % axis. Therfore, we need to calculate a rotation that accounts for the
 % Mathur viewing angle and alpha.
-azimuthDeg = (-viewingAngleDeg)-sceneGeometry.eye.alpha(1);
-elevationDeg = zeros(size(viewingAngleDeg))-sceneGeometry.eye.alpha(2);
+azimuthDeg = (-viewingAngleDeg)-sceneGeometry.eye.axes.alpha.degField(1);
+elevationDeg = zeros(size(viewingAngleDeg))-sceneGeometry.eye.axes.alpha.degField(2);
 
 % Assemble the eyePose
 eyePose=[azimuthDeg elevationDeg 0 pupilDiam/2];
