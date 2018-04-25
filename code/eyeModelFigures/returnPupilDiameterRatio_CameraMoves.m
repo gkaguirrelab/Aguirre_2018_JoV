@@ -1,4 +1,4 @@
-function [diamRatio, C, pupilFitError] = returnPupilDiameterRatio(viewingAngleDeg,pupilDiam,sceneGeometry)
+function [diamRatio, C, pupilFitError] = returnPupilDiameterRatio_CameraMoves(viewingAngleDeg,pupilDiam,sceneGeometry)
 
 % Setup the camera position and rotation properties
 sceneGeometry.cameraExtrinsic.translation = [0; 0; 100];
@@ -40,6 +40,10 @@ horizDiam =max(imagePoints(:,1)')-min(imagePoints(:,1)');
 vertDiam  =max(imagePoints(:,2)')-min(imagePoints(:,2)');
 theta = pupilEllipseOnImagePlane(5);
 diamRatio=horizDiam./vertDiam;
+
+% Scale pupil fit error by the radius of the pupil
+pupilFitError = pupilFitError / sqrt(pupilEllipseOnImagePlane(3)/pi);
+
 
 % Reverse the theta to match the Mathur convention, in which a theta of
 % zero corresponds to a pupil ellipse with the major axis aligned with the

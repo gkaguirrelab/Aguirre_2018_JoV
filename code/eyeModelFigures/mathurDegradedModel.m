@@ -36,7 +36,7 @@ for modelLevel = 1:nModels
             sg = createSceneGeometry('sphericalAmetropia',sphericalAmetropia);
     end
     for vv = 1:length(viewingAngleDeg)        
-        [diamRatios(modelLevel,vv), C(modelLevel,vv)] = returnPupilDiameterRatio(viewingAngleDeg(vv),pupilDiam,sg);
+        [diamRatios(modelLevel,vv), C(modelLevel,vv), pupilFitError(modelLevel,vv)] = returnPupilDiameterRatio_CameraMoves(viewingAngleDeg(vv),pupilDiam,sg);
     end
 end
 
@@ -74,3 +74,12 @@ for modelLevel = 1:nModels
     ylabel('Pupil Diameter Ratio - obliquity')
     title(titleStrings{modelLevel})
 end
+
+
+% Plot some images of the pupil at various extremes
+    figure
+    for azi = -60:30:60
+            eyePose = [azi 0 0 1];
+            renderEyePose(eyePose,sceneGeometry,'newFigure',false,'modelEyeLabelNames',{'pupilPerimeter'},'modelEyePlotColors',{'.g'});
+    end
+    
