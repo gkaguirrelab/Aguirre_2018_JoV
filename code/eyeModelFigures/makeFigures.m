@@ -21,3 +21,6 @@ saveThatSucker('turningPointByAmetropia.pdf');
 alphaByAmetropia
 saveThatSucker('alphaByAmetropia.pdf');
 
+%% mathurMovingEye
+mathurMovingEye
+saveThatSucker('mathurMovingEye.pdf');

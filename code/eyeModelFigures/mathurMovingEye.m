@@ -31,12 +31,5 @@ plot(rotationAngleDeg,C,'-','Color',[1 0 0]);
 axis square
 xlim([-90 90]);
 ylim([-.2 1.1]);
-xlabel('Viewing angle [deg]')
+xlabel('Rotation angle [deg]')
 ylabel('Pupil Diameter Ratio - obliquity')
-
-% Plot some images of the pupil at various extremes
-    figure
-    for azi = -60:30:60
-            eyePose = [azi 0 0 1];
-            renderEyePose(eyePose,sceneGeometry,'newFigure',false,'modelEyeLabelNames',{'pupilPerimeter'},'modelEyePlotColors',{'.g'});
-    end
