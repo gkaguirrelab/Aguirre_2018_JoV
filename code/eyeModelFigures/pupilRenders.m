@@ -8,11 +8,10 @@ sphericalAmetropia = -0.8308;
 sensorResolution=[960 720];
 intrinsicCameraMatrix = [2600 0 480; 0 2600 360; 0 0 1];
 
-
 sceneGeometry = createSceneGeometry('sphericalAmetropia',sphericalAmetropia,'intrinsicCameraMatrix',intrinsicCameraMatrix,'sensorResolution',sensorResolution);
 
 % Setup the camera position and rotation properties
-sceneGeometry.cameraExtrinsic.translation = [0; 0; 100];
+sceneGeometry.cameraPosition.translation = [0; 0; 100];
 sceneGeometry.eye.rotationCenters.azi = [0 0 0];
 sceneGeometry.eye.rotationCenters.ele = [0 0 0];
 
@@ -39,7 +38,19 @@ for vv = 1:length(viewingAngleDeg)
     
     % Assemble the eyePose
     eyePose=[azimuthDeg elevationDeg 0 pupilDiam/2];
+
+    % First, perform the forward projection to determine where the center of
+    % the pupil is located in the sceneWorld coordinates
+    [~, ~, sceneWorldPoints] = pupilProjection_fwd(eyePose, sceneGeometry, 'nPupilPerimPoints',50);
     
-    renderEyePose(eyePose, sceneGeometry,'modelEyeLabelNames',modelEyeLabelNames,'modelEyePlotColors',modelEyePlotColors);
+    % Adjust the sceneGeometry to translate the camera to be centered on
+    % geometric center of the pupil center in the sceneWorld space. This is an
+    % attempt to match the arrangement of the Mathur study, in which the
+    % examiner adjusted the camera to be centered on the pupil.
+    geometricPupilCenter = mean(sceneWorldPoints);
+    adjustedSceneGeometry = sceneGeometry;
+    adjustedSceneGeometry.cameraPosition.translation(1:2) = adjustedSceneGeometry.cameraPosition.translation(1:2)+geometricPupilCenter(1:2)';
+    
+    renderEyePose(eyePose, adjustedSceneGeometry,'modelEyeLabelNames',modelEyeLabelNames,'modelEyePlotColors',modelEyePlotColors);
 
 end

@@ -1,7 +1,7 @@
 function [diamRatio, C, pupilFitError] = returnPupilDiameterRatio_CameraMoves(viewingAngleDeg,pupilDiam,sceneGeometry)
 
 % Setup the camera position and rotation properties
-sceneGeometry.cameraExtrinsic.translation = [0; 0; 100];
+sceneGeometry.cameraPosition.translation = [0; 0; 100];
 sceneGeometry.eye.rotationCenters.azi = [0 0 0];
 sceneGeometry.eye.rotationCenters.ele = [0 0 0];
 
@@ -31,8 +31,7 @@ eyePose=[azimuthDeg elevationDeg 0 pupilDiam/2];
 % examiner adjusted the camera to be centered on the pupil.
 geometricPupilCenter = mean(sceneWorldPoints);
 adjustedSceneGeometry = sceneGeometry;
-adjustedSceneGeometry.cameraExtrinsic.translation(1) = adjustedSceneGeometry.cameraExtrinsic.translation(1)+geometricPupilCenter(1);
-adjustedSceneGeometry.cameraExtrinsic.translation(2) = adjustedSceneGeometry.cameraExtrinsic.translation(2)+geometricPupilCenter(2);
+adjustedSceneGeometry.cameraPosition.translation(1:2) = adjustedSceneGeometry.cameraPosition.translation(1:2)+geometricPupilCenter(1:2)';
 
 % Now, measure the horizontal and vertical width of the image of the pupil
 [pupilEllipseOnImagePlane, imagePoints, ~, ~, ~, ~, pupilFitError] = pupilProjection_fwd(eyePose, adjustedSceneGeometry, 'nPupilPerimPoints',50);

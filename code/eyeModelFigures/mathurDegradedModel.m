@@ -76,10 +76,4 @@ for modelLevel = 1:nModels
 end
 
 
-% Plot some images of the pupil at various extremes
-    figure
-    for azi = -60:30:60
-            eyePose = [azi 0 0 1];
-            renderEyePose(eyePose,sceneGeometry,'newFigure',false,'modelEyeLabelNames',{'pupilPerimeter'},'modelEyePlotColors',{'.g'});
-    end
     
