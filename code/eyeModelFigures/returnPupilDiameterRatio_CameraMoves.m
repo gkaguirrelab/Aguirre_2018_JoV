@@ -1,4 +1,4 @@
-function [diamRatio, C, pupilFitError] = returnPupilDiameterRatio_CameraMoves(viewingAngleDeg,pupilDiam,sceneGeometry)
+function [diamRatio, C, pupilFitError, theta] = returnPupilDiameterRatio_CameraMoves(viewingAngleDeg,pupilDiam,sceneGeometry)
 
 % Setup the camera position and rotation properties
 sceneGeometry.cameraPosition.translation = [0; 0; 100];
@@ -23,35 +23,29 @@ eyePose=[azimuthDeg elevationDeg 0 pupilDiam/2];
 
 % First, perform the forward projection to determine where the center of
 % the pupil is located in the sceneWorld coordinates
-[~, ~, sceneWorldPoints] = pupilProjection_fwd(eyePose, sceneGeometry, 'nPupilPerimPoints',50);
+[~, ~, worldPoints] = pupilProjection_fwd(eyePose, sceneGeometry);
 
 % Adjust the sceneGeometry to translate the camera to be centered on
 % geometric center of the pupil center in the sceneWorld space. This is an
 % attempt to match the arrangement of the Mathur study, in which the
 % examiner adjusted the camera to be centered on the pupil.
-geometricPupilCenter = mean(sceneWorldPoints);
+geometricPupilCenter = mean(worldPoints);
 adjustedSceneGeometry = sceneGeometry;
 adjustedSceneGeometry.cameraPosition.translation(1:2) = adjustedSceneGeometry.cameraPosition.translation(1:2)+geometricPupilCenter(1:2)';
 
-% Now, measure the horizontal and vertical width of the image of the pupil
-[pupilEllipseOnImagePlane, imagePoints, ~, ~, ~, ~, pupilFitError] = pupilProjection_fwd(eyePose, adjustedSceneGeometry, 'nPupilPerimPoints',50);
-horizDiam =max(imagePoints(:,1)')-min(imagePoints(:,1)');
-vertDiam  =max(imagePoints(:,2)')-min(imagePoints(:,2)');
+% Now, measure the pupil diameter ratio
+[pupilEllipseOnImagePlane, ~, ~, ~, ~, ~, pupilFitError] = pupilProjection_fwd(eyePose, adjustedSceneGeometry,'nPupilPerimPoints',16);
+
 theta = pupilEllipseOnImagePlane(5);
-diamRatio=horizDiam./vertDiam;
-
-% Scale pupil fit error by the radius of the pupil
-pupilFitError = pupilFitError / sqrt(pupilEllipseOnImagePlane(3)/pi);
-
-
 % Reverse the theta to match the Mathur convention, in which a theta of
 % zero corresponds to a pupil ellipse with the major axis aligned with the
 % horizontal meridian, and positive values of theta are in the
 % counter-clockwise direction.
 theta = pi - theta;
+p = ellipse_transparent2ex(pupilEllipseOnImagePlane);
+diamRatio=p(4)./p(3);
 
 % Calculate the Mathur value C from Equation 6
 C = (1-diamRatio).*sin(2.*(theta-pi/2));
-
 
 end

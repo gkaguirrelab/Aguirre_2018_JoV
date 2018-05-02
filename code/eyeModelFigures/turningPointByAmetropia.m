@@ -60,7 +60,7 @@ for aa = 1:length(ametropiaValues)
         % Obtain the turning point for the correct axial length
         sceneGeometry = createSceneGeometry('sphericalAmetropia',ametropiaValues(aa));
         for vv = 1:length(viewingAngleDeg)
-            [diamRatio(vv), C(vv), pupilFitError(vv)] = returnPupilDiameterRatio(viewingAngleDeg(vv),pupilDiam,sceneGeometry);
+            [diamRatio(vv), C(vv), pupilFitError(vv)] = returnPupilDiameterRatio_CameraMoves(viewingAngleDeg(vv),pupilDiam,sceneGeometry);
         end
         f = fit (viewingAngleDeg',diamRatio',eq7,'StartPoint',[5.3,0.93,1.12]);
         betas(aa) = f.beta;

@@ -8,14 +8,14 @@ sphericalAmetropia = -0.8308;
 sensorResolution=[960 720];
 intrinsicCameraMatrix = [2600 0 480; 0 2600 360; 0 0 1];
 
-sceneGeometry = createSceneGeometry('sphericalAmetropia',sphericalAmetropia,'intrinsicCameraMatrix',intrinsicCameraMatrix,'sensorResolution',sensorResolution);
+sceneGeometry = createSceneGeometry('sphericalAmetropia',sphericalAmetropia,'intrinsicCameraMatrix',intrinsicCameraMatrix,'sensorResolution',sensorResolution,'spectralDomain','vis');
 
 % Setup the camera position and rotation properties
 sceneGeometry.cameraPosition.translation = [0; 0; 100];
 sceneGeometry.eye.rotationCenters.azi = [0 0 0];
 sceneGeometry.eye.rotationCenters.ele = [0 0 0];
 
-viewingAngleDeg = -50:25:50;
+viewingAngleDeg = -60:30:60;
 
 modelEyeLabelNames = {'posteriorChamber' 'irisPerimeter' 'pupilPerimeter' 'anteriorChamber'};
 modelEyePlotColors = {'.w' '.b' '*g' '.y'};
@@ -51,6 +51,6 @@ for vv = 1:length(viewingAngleDeg)
     adjustedSceneGeometry = sceneGeometry;
     adjustedSceneGeometry.cameraPosition.translation(1:2) = adjustedSceneGeometry.cameraPosition.translation(1:2)+geometricPupilCenter(1:2)';
     
-    renderEyePose(eyePose, adjustedSceneGeometry,'modelEyeLabelNames',modelEyeLabelNames,'modelEyePlotColors',modelEyePlotColors);
+    renderEyePose(eyePose, adjustedSceneGeometry,'modelEyeLabelNames',modelEyeLabelNames,'modelEyePlotColors',modelEyePlotColors,'removeOccultedPoints',false);
 
 end

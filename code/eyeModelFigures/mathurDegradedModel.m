@@ -4,39 +4,65 @@
 % components of the model.
 
 % The range for our plots
-viewingAngleDeg = -70:1:70;
-
-% The size of the exit pupil
-pupilDiam = 6.19/1.13;
+viewingAngleDeg = -60:1:60;
 
 % The refractive error of the subject for the average Mathur data.
-sphericalAmetropia = -0.8308;
+sphericalAmetropia = -0.72;
 
-nModels = 4;
+% The size of the exit pupil
+% The eye was dilated with 1% Cyclopentolate which in adults produces an
+% entrance pupil of 6.28 mm:
+%
+%   Kyei, Samuel, et al. "Onset and duration of cycloplegic action of 1%
+%   Cyclopentolate-1% Tropicamide combination." African health sciences
+%   17.3 (2017): 923-932.
+%
+% 
+entrancePupilDiam = 6.28;
+%{
+            entranceRadius = 6.28/2;
+            % Prepare scene geometry and eye pose aligned with visual axis
+            sceneGeometry = createSceneGeometry();
+            % Obtain the pupil area in the image for the entrance radius
+            % assuming no ray tracing
+            sceneGeometry.refraction = [];
+            pupilImage = pupilProjection_fwd([-sceneGeometry.eye.axes.alpha.degField(1), -sceneGeometry.eye.axes.alpha.degField(2), 0, entranceRadius],sceneGeometry);
+            exitArea = pupilImage(3);
+            % Add the ray tracing function to the sceneGeometry
+            sceneGeometry = createSceneGeometry();
+            % Search across exit pupil radii to find the value that matches
+            % the observed entrance area.
+            myPupilEllipse = @(radius) pupilProjection_fwd([-sceneGeometry.eye.axes.alpha.degField(1), -sceneGeometry.eye.axes.alpha.degField(2), 0, radius],sceneGeometry);
+            myArea = @(ellipseParams) ellipseParams(3);
+            myObj = @(radius) (myArea(myPupilEllipse(radius))-exitArea(1)).^2;
+            exitRadius = fminunc(myObj, entranceRadius);
+%}
+exitPupilDiam = 2.8458*2;
+
+nModels = 5;
 
 clear diamRatios C
 for modelLevel = 1:nModels
     switch modelLevel
         case 1
-            sg = createSceneGeometry('sphericalAmetropia',sphericalAmetropia);
+            sg = createSceneGeometry('sphericalAmetropia',sphericalAmetropia,'spectralDomain','vis');
             sg.refraction = [];
             sg.eye.axes.alpha.degField = [0 0 0];
             sg.eye.pupil.eccenFcnString = '@(x) 0';
-            sg.eye.pupil.thetas = [0 pi/2];
         case 2
-            sg = createSceneGeometry('sphericalAmetropia',sphericalAmetropia);
-            sg.eye.axes.alpha.degField = [0 0 0];
+            sg = createSceneGeometry('sphericalAmetropia',sphericalAmetropia,'spectralDomain','vis');
+            sg.refraction = [];
             sg.eye.pupil.eccenFcnString = '@(x) 0';
-            sg.eye.pupil.thetas = [0 pi/2];
         case 3
-            sg = createSceneGeometry('sphericalAmetropia',sphericalAmetropia);
+            sg = createSceneGeometry('sphericalAmetropia',sphericalAmetropia,'spectralDomain','vis');
             sg.eye.pupil.eccenFcnString = '@(x) 0';
-            sg.eye.pupil.thetas = [0 pi/2];
         case 4
-            sg = createSceneGeometry('sphericalAmetropia',sphericalAmetropia);
+            sg = createSceneGeometry('sphericalAmetropia',sphericalAmetropia,'spectralDomain','vis','aqueousRefractiveIndex',1.225);
+        case 5
+            sg = createSceneGeometry('sphericalAmetropia',sphericalAmetropia,'spectralDomain','vis');
     end
     for vv = 1:length(viewingAngleDeg)        
-        [diamRatios(modelLevel,vv), C(modelLevel,vv), pupilFitError(modelLevel,vv)] = returnPupilDiameterRatio_CameraMoves(viewingAngleDeg(vv),pupilDiam,sg);
+        [diamRatios(modelLevel,vv), C(modelLevel,vv), pupilFitError(modelLevel,vv), thetas(modelLevel,vv)] = returnPupilDiameterRatio_CameraMoves(viewingAngleDeg(vv),exitPupilDiam,sg);
     end
 end
 
@@ -51,9 +77,9 @@ mathurEq11 = @(viewingAngleDeg) 0.00072.*viewingAngleDeg-0.0008;
 % Plot the results.
 figure
 
-titleStrings = {'no model','add ray trace','add alpha','add non-circular exit pupil'};
+titleStrings = {'no model','add alpha','add ray trace','add non-circular exit pupil','adjust aqueous RI'};
 for modelLevel = 1:nModels
-    subplot(2,2,modelLevel);
+    subplot(2,3,modelLevel);
     hold on
     plot(viewingAngleDeg,mathurEq9(viewingAngleDeg) ,'-','Color',[.5 .5 .5]);
     plot(viewingAngleDeg,cosd(viewingAngleDeg),':','Color',[.5 .5 .5]);
@@ -75,5 +101,17 @@ for modelLevel = 1:nModels
     title(titleStrings{modelLevel})
 end
 
+% figure
+% for modelLevel = 1:nModels
+%     subplot(2,2,modelLevel);
+%     plot(viewingAngleDeg,pupilFitError(modelLevel,:),'-','Color',[1 0 0]);
+% 
+%     axis square
+%     xlim([-90 90]);
+%     ylim([0 2]);
+%     xlabel('Viewing angle [deg]')
+%     ylabel('Pupil Diameter Ratio - obliquity')
+%     title(titleStrings{modelLevel})
+% end
 
     
