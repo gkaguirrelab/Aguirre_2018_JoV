@@ -57,9 +57,9 @@ for modelLevel = 1:nModels
             sg = createSceneGeometry('sphericalAmetropia',sphericalAmetropia,'spectralDomain','vis');
             sg.eye.pupil.eccenFcnString = '@(x) 0';
         case 4
-            sg = createSceneGeometry('sphericalAmetropia',sphericalAmetropia,'spectralDomain','vis','aqueousRefractiveIndex',1.225);
-        case 5
             sg = createSceneGeometry('sphericalAmetropia',sphericalAmetropia,'spectralDomain','vis');
+        case 5
+            sg = createSceneGeometry('sphericalAmetropia',sphericalAmetropia,'spectralDomain','vis','aqueousRefractiveIndex',1.225);
     end
     for vv = 1:length(viewingAngleDeg)        
         [diamRatios(modelLevel,vv), C(modelLevel,vv), pupilFitError(modelLevel,vv), thetas(modelLevel,vv)] = returnPupilDiameterRatio_CameraMoves(viewingAngleDeg(vv),exitPupilDiam,sg);
