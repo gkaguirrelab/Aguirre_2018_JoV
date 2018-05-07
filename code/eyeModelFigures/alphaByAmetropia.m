@@ -35,8 +35,8 @@ sphericalAmetropias = -15:1:5;
 clear alphaAzi alphaEle
 for aa = 1:length(sphericalAmetropias)
     eye = modelEyeParameters('sphericalAmetropia',sphericalAmetropias(aa));
-    alphaAzi(aa)= eye.axes.alpha.degField(1);
-    alphaEle(aa)= eye.axes.alpha.degField(2);
+    alphaAzi(aa)= eye.axes.visual.degField(1);
+    alphaEle(aa)= eye.axes.visual.degField(2);
 end
 plot(sphericalAmetropias,alphaAzi,'-r')
 
@@ -47,8 +47,8 @@ for aa = 1:length(sphericalAmetropias)
     % This retinal fovea angle yields an azimuth alpha of 5 deg in the
     % emmetropic eye, matching the Tabernero model
     eye = modelEyeParameters('sphericalAmetropia',sphericalAmetropias(aa),'foveaAngle',[7.015 0 0]);
-    alphaAzi(aa)= eye.axes.alpha.degField(1);
-    alphaEle(aa)= eye.axes.alpha.degField(2);
+    alphaAzi(aa)= eye.axes.visual.degField(1);
+    alphaEle(aa)= eye.axes.visual.degField(2);
 end
 plot(sphericalAmetropias,alphaAzi,':b')
 

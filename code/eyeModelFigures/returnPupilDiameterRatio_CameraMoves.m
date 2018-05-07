@@ -1,4 +1,4 @@
-function [diamRatio, C, pupilFitError, theta] = returnPupilDiameterRatio_CameraMoves(viewingAngleDeg,pupilDiam,sceneGeometry)
+function [diamRatio, C, pupilFitError, theta, horizPixels, vertPixels] = returnPupilDiameterRatio_CameraMoves(viewingAngleDeg,pupilDiam,sceneGeometry)
 
 % Setup the camera position and rotation properties
 sceneGeometry.cameraPosition.translation = [0; 0; 100];
@@ -15,26 +15,29 @@ sceneGeometry.eye.rotationCenters.ele = [0 0 0];
 % the eye. The coordinates of our model eye are based around the pupil
 % axis. Therfore, we need to calculate a rotation that accounts for the
 % Mathur viewing angle and alpha.
-azimuthDeg = (-viewingAngleDeg)-sceneGeometry.eye.axes.alpha.degField(1);
-elevationDeg = zeros(size(viewingAngleDeg))-sceneGeometry.eye.axes.alpha.degField(2);
+azimuthDeg = (-viewingAngleDeg)-sceneGeometry.eye.axes.visual.degField(1);
+elevationDeg = zeros(size(viewingAngleDeg))-sceneGeometry.eye.axes.visual.degField(2);
 
 % Assemble the eyePose
 eyePose=[azimuthDeg elevationDeg 0 pupilDiam/2];
 
 % First, perform the forward projection to determine where the center of
 % the pupil is located in the sceneWorld coordinates
-[~, ~, worldPoints] = pupilProjection_fwd(eyePose, sceneGeometry);
+sceneGeometryNoRefract = sceneGeometry;
+sceneGeometryNoRefract.refraction = [];
+[~, ~, worldPoints, ~, pointLabels] = pupilProjection_fwd(eyePose, sceneGeometryNoRefract,'fullEyeModelFlag',true);
+idx = strcmp(pointLabels,'pupilCenter');
+pupilCenter = worldPoints(idx,:);
 
 % Adjust the sceneGeometry to translate the camera to be centered on
 % geometric center of the pupil center in the sceneWorld space. This is an
 % attempt to match the arrangement of the Mathur study, in which the
 % examiner adjusted the camera to be centered on the pupil.
-geometricPupilCenter = mean(worldPoints);
 adjustedSceneGeometry = sceneGeometry;
-adjustedSceneGeometry.cameraPosition.translation(1:2) = adjustedSceneGeometry.cameraPosition.translation(1:2)+geometricPupilCenter(1:2)';
+adjustedSceneGeometry.cameraPosition.translation = adjustedSceneGeometry.cameraPosition.translation+pupilCenter';
 
 % Now, measure the pupil diameter ratio
-[pupilEllipseOnImagePlane, ~, ~, ~, ~, ~, pupilFitError] = pupilProjection_fwd(eyePose, adjustedSceneGeometry,'nPupilPerimPoints',16);
+[pupilEllipseOnImagePlane, imagePoints, ~, ~, ~, ~, pupilFitError] = pupilProjection_fwd(eyePose, adjustedSceneGeometry,'nPupilPerimPoints',16);
 
 theta = pupilEllipseOnImagePlane(5);
 % Reverse the theta to match the Mathur convention, in which a theta of
@@ -44,6 +47,10 @@ theta = pupilEllipseOnImagePlane(5);
 theta = pi - theta;
 p = ellipse_transparent2ex(pupilEllipseOnImagePlane);
 diamRatio=p(4)./p(3);
+
+k = max(imagePoints) - min(imagePoints);
+horizPixels = k(1);
+vertPixels = k(2);
 
 % Calculate the Mathur value C from Equation 6
 C = (1-diamRatio).*sin(2.*(theta-pi/2));

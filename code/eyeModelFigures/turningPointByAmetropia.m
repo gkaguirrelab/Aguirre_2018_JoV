@@ -46,7 +46,7 @@ mathurData = [-4.943273905996759, -0.8298755186722002
 
 
 viewingAngleDeg = -60:10:60;
-pupilDiam = 6.19/1.13;
+exitPupilDiam = 2.6330*2;
 
 % Derive the axial length of the eye for each of several ametropia values
 ametropiaValues = -7:1:7;
@@ -60,11 +60,11 @@ for aa = 1:length(ametropiaValues)
         % Obtain the turning point for the correct axial length
         sceneGeometry = createSceneGeometry('sphericalAmetropia',ametropiaValues(aa));
         for vv = 1:length(viewingAngleDeg)
-            [diamRatio(vv), C(vv), pupilFitError(vv)] = returnPupilDiameterRatio_CameraMoves(viewingAngleDeg(vv),pupilDiam,sceneGeometry);
+            [diamRatio(vv), C(vv), pupilFitError(vv)] = returnPupilDiameterRatio_CameraMoves(viewingAngleDeg(vv),exitPupilDiam,sceneGeometry);
         end
         f = fit (viewingAngleDeg',diamRatio',eq7,'StartPoint',[5.3,0.93,1.12]);
         betas(aa) = f.beta;
-        alphas(aa) = sceneGeometry.eye.axes.alpha.degField(1);
+        alphas(aa) = sceneGeometry.eye.axes.visual.degField(1);
 end
 
 % Plot the mathur data

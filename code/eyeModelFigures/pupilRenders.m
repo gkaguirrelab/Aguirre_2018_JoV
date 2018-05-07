@@ -1,9 +1,9 @@
 
 % The size of the exit pupil
-pupilDiam = 6.19/1.13;
+exitPupilDiam = 2.6330*2;
 
 % The refractive error of the subject for the average Mathur data.
-sphericalAmetropia = -0.8308;
+sphericalAmetropia = -0.7;
 
 sensorResolution=[960 720];
 intrinsicCameraMatrix = [2600 0 480; 0 2600 360; 0 0 1];
@@ -15,14 +15,14 @@ sceneGeometry.cameraPosition.translation = [0; 0; 100];
 sceneGeometry.eye.rotationCenters.azi = [0 0 0];
 sceneGeometry.eye.rotationCenters.ele = [0 0 0];
 
-viewingAngleDeg = -60:30:60;
+viewingAngleDeg = -65:30:55;
 
-modelEyeLabelNames = {'posteriorChamber' 'irisPerimeter' 'pupilPerimeter' 'anteriorChamber'};
-modelEyePlotColors = {'.w' '.b' '*g' '.y'};
+modelEyeLabelNames = {'posteriorChamber' 'irisPerimeter' 'pupilPerimeter' 'pupilCenter' 'anteriorChamber'};
+modelEyePlotColors = {'.w' '.b' '*g' '+r' '.y'};
 
 
 for vv = 1:length(viewingAngleDeg)
-        
+    
     % Our model rotates the eye. For the right eye, a positive azimuth rotates
     % the eye such that the center of the pupil moves to the right of the
     % image. This means that a positive azimuth corresponds to the camera being
@@ -37,20 +37,23 @@ for vv = 1:length(viewingAngleDeg)
     elevationDeg = -sceneGeometry.eye.axes.alpha.degField(2);
     
     % Assemble the eyePose
-    eyePose=[azimuthDeg elevationDeg 0 pupilDiam/2];
-
+    eyePose=[azimuthDeg elevationDeg 0 exitPupilDiam/2];
+    
     % First, perform the forward projection to determine where the center of
     % the pupil is located in the sceneWorld coordinates
-    [~, ~, sceneWorldPoints] = pupilProjection_fwd(eyePose, sceneGeometry, 'nPupilPerimPoints',50);
+    sceneGeometryNoRefract = sceneGeometry;
+    sceneGeometryNoRefract.refraction = [];
+    [~, ~, worldPoints, ~, pointLabels] = pupilProjection_fwd(eyePose, sceneGeometryNoRefract,'fullEyeModelFlag',true);
+    idx = strcmp(pointLabels,'pupilCenter');
+    pupilCenter = worldPoints(idx,:);
     
     % Adjust the sceneGeometry to translate the camera to be centered on
     % geometric center of the pupil center in the sceneWorld space. This is an
     % attempt to match the arrangement of the Mathur study, in which the
     % examiner adjusted the camera to be centered on the pupil.
-    geometricPupilCenter = mean(sceneWorldPoints);
     adjustedSceneGeometry = sceneGeometry;
-    adjustedSceneGeometry.cameraPosition.translation(1:2) = adjustedSceneGeometry.cameraPosition.translation(1:2)+geometricPupilCenter(1:2)';
+    adjustedSceneGeometry.cameraPosition.translation = adjustedSceneGeometry.cameraPosition.translation+pupilCenter';
     
     renderEyePose(eyePose, adjustedSceneGeometry,'modelEyeLabelNames',modelEyeLabelNames,'modelEyePlotColors',modelEyePlotColors,'removeOccultedPoints',false);
-
+    
 end
