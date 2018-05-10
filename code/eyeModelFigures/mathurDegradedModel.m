@@ -37,7 +37,7 @@ entrancePupilDiam = 6;
             myObj = @(radius) (myArea(myPupilEllipse(radius))-actualArea(1)).^2;
             actualRadius = fminunc(myObj, entranceRadius)
 %}
-actualPupilDiam = 2.6330*2;
+actualPupilDiam = 2.6453*2;
 
 nModels = 5;
 
@@ -118,7 +118,7 @@ for modelLevel = 1:nModels
     RMSE = sqrt(mean((C(modelLevel,:)-mathurEq11(viewingAngleDeg)).^2));
     text(0,-0.1,sprintf('RMSE = %1.0e',RMSE),'HorizontalAlignment','Center');
 
-    axis square
+    pbaspect([1 1.5 1])
     xlim([-90 90]);
     ylim([-.2 1.1]);
     xlabel('Viewing angle [deg]')
@@ -126,31 +126,14 @@ for modelLevel = 1:nModels
     title(titleStrings{modelLevel})
 end
 
-% figure
-% for modelLevel = 1:nModels
-%     subplot(3,2,modelLevel);
-%     plot(viewingAngleDeg,horizPixels(modelLevel,:),'-','Color',[1 0 0]);
-%     hold on
-%     plot(viewingAngleDeg,vertPixels(modelLevel,:),'-','Color',[0 0 0]);
-%     axis square
-%     xlim([-90 90]);
-%     xlabel('Viewing angle [deg]')
-%     ylabel('hoiz and vert pixel widths')
-%     title(titleStrings{modelLevel})
-% end
-
-
 
 figure
-for modelLevel = 1:nModels
-    subplot(3,2,modelLevel);
-    plot(viewingAngleDeg,pupilFitError(modelLevel,:),'-','Color',[1 0 0]);
+    plot(viewingAngleDeg,pupilFitError(nModels,:),'-','Color',[1 0 0]);
     axis square
     xlim([-90 90]);
-    ylim([0 2]);
+    ylim([0 1]);
     xlabel('Viewing angle [deg]')
     ylabel('Elliptical fit error')
     title(titleStrings{modelLevel})
-end
 
     

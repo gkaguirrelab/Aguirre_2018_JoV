@@ -4,19 +4,19 @@
 % remaining stationary and the eye rotating
 
 % The range for our plots
-rotationAngleDeg = -60:1:60;
+rotationAngleDeg = -55:1:65;
 
 % The size of the exit pupil
-pupilDiam = 6.19/1.13;
+actualPupilDiam = 2.6453*2;
 
 % The refractive error of the subject for the average Mathur data.
-sphericalAmetropia = -0.8308;
+sphericalAmetropia = -0.7;
 
 
 clear diamRatios C pupilFitError
 sg = createSceneGeometry('sphericalAmetropia',sphericalAmetropia);
 for vv = 1:length(rotationAngleDeg)
-    [diamRatios(vv), C(vv), pupilFitError(vv)] = returnPupilDiameterRatio_EyeMoves(rotationAngleDeg(vv),pupilDiam,sg);
+    [diamRatios(vv), C(vv), pupilFitError(vv)] = returnPupilDiameterRatio_EyeMoves(rotationAngleDeg(vv),actualPupilDiam,sg);
 end
 
 

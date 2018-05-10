@@ -1,6 +1,6 @@
 
 % The size of the exit pupil
-exitPupilDiam = 2.6330*2;
+actualPupilDiam = 2.6451*2;
 
 % The refractive error of the subject for the average Mathur data.
 sphericalAmetropia = -0.7;
@@ -17,8 +17,8 @@ sceneGeometry.eye.rotationCenters.ele = [0 0 0];
 
 viewingAngleDeg = -65:30:55;
 
-modelEyeLabelNames = {'posteriorChamber' 'irisPerimeter' 'pupilPerimeter' 'pupilCenter' 'anteriorChamber'};
-modelEyePlotColors = {'.w' '.b' '*g' '+r' '.y'};
+modelEyeLabelNames = {'posteriorChamber' 'posteriorChamber_hidden' 'irisPerimeter' 'pupilPerimeterFront' 'pupilPerimeterBack' 'pupilEllipse' 'pupilCenter' 'anteriorChamber'};
+modelEyePlotColors = {'.w' '.w' '.b' '*g' '*g' '-g' '+r' '.y'};
 
 
 for vv = 1:length(viewingAngleDeg)
@@ -37,7 +37,7 @@ for vv = 1:length(viewingAngleDeg)
     elevationDeg = -sceneGeometry.eye.axes.visual.degField(2);
     
     % Assemble the eyePose
-    eyePose=[azimuthDeg elevationDeg 0 exitPupilDiam/2];
+    eyePose=[azimuthDeg elevationDeg 0 actualPupilDiam/2];
     
     % First, perform the forward projection to determine where the center of
     % the pupil is located in the sceneWorld coordinates
@@ -54,6 +54,6 @@ for vv = 1:length(viewingAngleDeg)
     adjustedSceneGeometry = sceneGeometry;
     adjustedSceneGeometry.cameraPosition.translation = adjustedSceneGeometry.cameraPosition.translation+pupilCenter';
     
-    renderEyePose(eyePose, adjustedSceneGeometry,'modelEyeLabelNames',modelEyeLabelNames,'modelEyePlotColors',modelEyePlotColors,'removeOccultedPoints',false);
+    renderEyePose(eyePose, adjustedSceneGeometry,'modelEyeLabelNames',modelEyeLabelNames,'modelEyePlotColors',modelEyePlotColors);
     
 end
