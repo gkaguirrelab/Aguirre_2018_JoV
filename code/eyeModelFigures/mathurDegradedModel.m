@@ -9,7 +9,7 @@ viewingAngleDeg = -65:1:55;
 % The refractive error of the subject for the average Mathur data.
 sphericalAmetropia = -0.7;
 
-% The size of the exit pupil
+% The size of the actual pupil
 % The eye was dilated with 1% Cyclopentolate which in adults produces an
 % entrance pupil of ~6 mm:
 %
@@ -27,17 +27,17 @@ entrancePupilDiam = 6;
             % assuming no ray tracing
             sceneGeometry.refraction = [];
             pupilImage = pupilProjection_fwd([0, 0, 0, entranceRadius],sceneGeometry);
-            exitArea = pupilImage(3);
+            actualArea = pupilImage(3);
             % Add the ray tracing function to the sceneGeometry
             sceneGeometry = createSceneGeometry();
-            % Search across exit pupil radii to find the value that matches
+            % Search across actual pupil radii to find the value that matches
             % the observed entrance area.
             myPupilEllipse = @(radius) pupilProjection_fwd([0, 0, 0, radius],sceneGeometry);
             myArea = @(ellipseParams) ellipseParams(3);
-            myObj = @(radius) (myArea(myPupilEllipse(radius))-exitArea(1)).^2;
-            exitRadius = fminunc(myObj, entranceRadius)
+            myObj = @(radius) (myArea(myPupilEllipse(radius))-actualArea(1)).^2;
+            actualRadius = fminunc(myObj, entranceRadius)
 %}
-exitPupilDiam = 2.6330*2;
+actualPupilDiam = 2.6330*2;
 
 nModels = 5;
 
@@ -49,21 +49,24 @@ for modelLevel = 1:nModels
             sg.refraction = [];
             sg.eye.axes.visual.degField = [0 0 0];
             sg.eye.pupil.eccenFcnString = '@(x) 0';
+            sg.eye.iris.thickness = 0;
         case 2
             sg = createSceneGeometry('sphericalAmetropia',sphericalAmetropia,'spectralDomain','vis');
             sg.refraction = [];
             sg.eye.pupil.eccenFcnString = '@(x) 0';
+            sg.eye.iris.thickness = 0;
         case 3
             sg = createSceneGeometry('sphericalAmetropia',sphericalAmetropia,'spectralDomain','vis');
             sg.eye.pupil.eccenFcnString = '@(x) 0';
+            sg.eye.iris.thickness = 0;
         case 4
             sg = createSceneGeometry('sphericalAmetropia',sphericalAmetropia,'spectralDomain','vis');
+            sg.eye.iris.thickness = 0;
         case 5
             sg = createSceneGeometry('sphericalAmetropia',sphericalAmetropia,'spectralDomain','vis');
-            sg.refraction.opticalSystem(1,5) = 1.25;
     end
     for vv = 1:length(viewingAngleDeg)        
-        [diamRatios(modelLevel,vv), C(modelLevel,vv), pupilFitError(modelLevel,vv), thetas(modelLevel,vv), horizPixels(modelLevel,vv), vertPixels(modelLevel,vv) ] = returnPupilDiameterRatio_CameraMoves(viewingAngleDeg(vv),exitPupilDiam,sg);
+        [diamRatios(modelLevel,vv), C(modelLevel,vv), pupilFitError(modelLevel,vv), thetas(modelLevel,vv), horizPixels(modelLevel,vv), vertPixels(modelLevel,vv) ] = returnPupilDiameterRatio_CameraMoves(viewingAngleDeg(vv),actualPupilDiam,sg);
     end
 end
 
@@ -84,13 +87,21 @@ mathurEq11 = @(viewingAngleDeg) 0.00072.*viewingAngleDeg-0.0008;
 fedtkeFig9Data = [   78.0328   70.3279   57.7049   51.6393   44.4262   35.2459   28.0328   11.9672    1.8033; ...
     0.4057    0.5009    0.6447    0.7082    0.7779    0.8541    0.9048    0.9789    0.9979];
 
-fedtkeFit = fit (fedtkeFig9Data(1,:)',fedtkeFig9Data(2,:)',eq7,'StartPoint',[5.3,0.93,1.12]);
+fedtkeFit = fit (fedtkeFig9Data(1,:)',fedtkeFig9Data(2,:)',mathurEq7,'StartPoint',[5.3,0.93,1.12]);
 
-        
+% Confirm here that the fedtkeFit reproduces the Fedtke model from figure 9
+% of Fedtke 2013.
+%{
+    figure
+    plot(fedtkeFig9Data(1,:),fedtkeFig9Data(2,:),'*k');
+    hold on
+    plot(fedtkeFig9Data(1,:),fedtkeFit(fedtkeFig9Data(1,:)),'-r');
+%}
+
 % Plot the results.
 figure
 
-titleStrings = {'no model','add alpha','add ray trace','add non-circular exit pupil','adjust aqueous RI'};
+titleStrings = {'no model','add alpha','add ray trace','add non-circular actual pupil','add iris thickness'};
 for modelLevel = 1:nModels
     subplot(3,2,modelLevel);
     hold on
@@ -111,13 +122,13 @@ for modelLevel = 1:nModels
     xlim([-90 90]);
     ylim([-.2 1.1]);
     xlabel('Viewing angle [deg]')
-    ylabel('Pupil Diameter Ratio - obliquity')
+    ylabel('Pupil Diameter Ratio / obliquity')
     title(titleStrings{modelLevel})
 end
-% 
+
 % figure
 % for modelLevel = 1:nModels
-%     subplot(2,2,modelLevel);
+%     subplot(3,2,modelLevel);
 %     plot(viewingAngleDeg,horizPixels(modelLevel,:),'-','Color',[1 0 0]);
 %     hold on
 %     plot(viewingAngleDeg,vertPixels(modelLevel,:),'-','Color',[0 0 0]);
@@ -127,20 +138,19 @@ end
 %     ylabel('hoiz and vert pixel widths')
 %     title(titleStrings{modelLevel})
 % end
-% 
-% 
-% 
-% figure
-% for modelLevel = 1:nModels
-%     subplot(2,2,modelLevel);
-%     plot(viewingAngleDeg,pupilFitError(modelLevel,:),'-','Color',[1 0 0]);
-% 
-%     axis square
-%     xlim([-90 90]);
-%     ylim([0 2]);
-%     xlabel('Viewing angle [deg]')
-%     ylabel('Elliptical fit error')
-%     title(titleStrings{modelLevel})
-% end
+
+
+
+figure
+for modelLevel = 1:nModels
+    subplot(3,2,modelLevel);
+    plot(viewingAngleDeg,pupilFitError(modelLevel,:),'-','Color',[1 0 0]);
+    axis square
+    xlim([-90 90]);
+    ylim([0 2]);
+    xlabel('Viewing angle [deg]')
+    ylabel('Elliptical fit error')
+    title(titleStrings{modelLevel})
+end
 
     

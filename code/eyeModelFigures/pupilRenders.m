@@ -29,12 +29,12 @@ for vv = 1:length(viewingAngleDeg)
     % positioned in the temporal portion of the visual field. So, we must sign
     % reverse the interpretation of our azimuthal values for measurements made
     % in the right eye to correspond to the Mathur results. Additionally, we
-    % need to adjust for alpha: the angle between the pupil and visual axes of
+    % need to adjust for visual: the angle between the pupil and visual axes of
     % the eye. The coordinates of our model eye are based around the pupil
     % axis. Therfore, we need to calculate a rotation that accounts for the
-    % Mathur viewing angle and alpha.
-    azimuthDeg = (-viewingAngleDeg(vv))-sceneGeometry.eye.axes.alpha.degField(1);
-    elevationDeg = -sceneGeometry.eye.axes.alpha.degField(2);
+    % Mathur viewing angle and visual.
+    azimuthDeg = (-viewingAngleDeg(vv))-sceneGeometry.eye.axes.visual.degField(1);
+    elevationDeg = -sceneGeometry.eye.axes.visual.degField(2);
     
     % Assemble the eyePose
     eyePose=[azimuthDeg elevationDeg 0 exitPupilDiam/2];
