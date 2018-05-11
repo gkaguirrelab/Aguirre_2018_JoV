@@ -56,4 +56,8 @@ for vv = 1:length(viewingAngleDeg)
     
     renderEyePose(eyePose, adjustedSceneGeometry,'modelEyeLabelNames',modelEyeLabelNames,'modelEyePlotColors',modelEyePlotColors);
     
+    figureName=['cameraMoves_' num2str(viewingAngleDeg(vv)) '.pdf'];
+    
+    saveThatSucker(figureName)
+    
 end
