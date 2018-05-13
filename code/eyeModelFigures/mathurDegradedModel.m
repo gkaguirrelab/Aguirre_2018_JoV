@@ -17,7 +17,7 @@ sphericalAmetropia = -0.7;
 %   Cyclopentolate-1% Tropicamide combination." African health sciences
 %   17.3 (2017): 923-932.
 %
-% 
+%
 entrancePupilDiam = 6;
 %{
             entranceRadius = 6/2;
@@ -38,6 +38,18 @@ entrancePupilDiam = 6;
             actualRadius = fminunc(myObj, entranceRadius)
 %}
 actualPupilDiam = 2.6453*2;
+
+%{
+    % Probe the forward model at the estimated pose angles to
+    % estimate the pupil radius.
+    sceneGeometry = createSceneGeometry();
+    sceneGeometry.cameraPosition.translation = [0; 0; 100];
+    eyePose = [-sceneGeometry.eye.axes.visual.degRetina 2];
+    probeEllipse=pupilProjection_fwd(eyePose, sceneGeometry);
+    pixelsPerMM = sqrt(probeEllipse(3)/pi)/2;
+%}
+pixelsPerMM = 28.3544;
+
 
 nModels = 5;
 
@@ -61,11 +73,11 @@ for modelLevel = 1:nModels
             sg.eye.iris.thickness = 0;
         case 4
             sg = createSceneGeometry('sphericalAmetropia',sphericalAmetropia,'spectralDomain','vis');
-            sg.eye.iris.thickness = 0;
+            sg.eye.pupil.eccenFcnString = '@(x) 0';
         case 5
             sg = createSceneGeometry('sphericalAmetropia',sphericalAmetropia,'spectralDomain','vis');
     end
-    for vv = 1:length(viewingAngleDeg)        
+    for vv = 1:length(viewingAngleDeg)
         [diamRatios(modelLevel,vv), C(modelLevel,vv), pupilFitError(modelLevel,vv), thetas(modelLevel,vv), horizPixels(modelLevel,vv), vertPixels(modelLevel,vv) ] = returnPupilDiameterRatio_CameraMoves(viewingAngleDeg(vv),actualPupilDiam,sg);
     end
 end
@@ -87,7 +99,10 @@ mathurEq11 = @(viewingAngleDeg) 0.00072.*viewingAngleDeg-0.0008;
 fedtkeFig9Data = [   78.0328   70.3279   57.7049   51.6393   44.4262   35.2459   28.0328   11.9672    1.8033; ...
     0.4057    0.5009    0.6447    0.7082    0.7779    0.8541    0.9048    0.9789    0.9979];
 
-fedtkeFit = fit (fedtkeFig9Data(1,:)',fedtkeFig9Data(2,:)',mathurEq7,'StartPoint',[5.3,0.93,1.12]);
+% Mathur 2013 Equation 7, Fedtke restricted.
+mathurEq7Fedtke = fittype( @(E,x) 1.0.*cosd((x-0)./E), 'independent','x','dependent','y');
+
+fedtkeFit = fit (fedtkeFig9Data(1,:)',fedtkeFig9Data(2,:)',mathurEq7Fedtke,'StartPoint',[1.12]);
 
 % Confirm here that the fedtkeFit reproduces the Fedtke model from figure 9
 % of Fedtke 2013.
@@ -101,7 +116,7 @@ fedtkeFit = fit (fedtkeFig9Data(1,:)',fedtkeFig9Data(2,:)',mathurEq7,'StartPoint
 % Plot the results.
 figure
 
-titleStrings = {'no model','add alpha','add ray trace','add non-circular actual pupil','add iris thickness'};
+titleStrings = {'no model','add alpha','add ray trace','add iris thickness','add non-circular pupil aperture',};
 for modelLevel = 1:nModels
     subplot(3,2,modelLevel);
     hold on
@@ -111,13 +126,13 @@ for modelLevel = 1:nModels
     plot(viewingAngleDeg,fedtkeFit(viewingAngleDeg),'-g');
     RMSE = sqrt(mean((diamRatios(modelLevel,:)-mathurEq9(viewingAngleDeg)).^2));
     text(0,0.6,sprintf('RMSE = %1.0e',RMSE),'HorizontalAlignment','Center');
-
+    
     plot(viewingAngleDeg,mathurEq11(viewingAngleDeg),'-','Color',[.5 .5 .5]);
     plot(viewingAngleDeg,viewingAngleDeg.*0,':','Color',[.5 .5 .5]);
     plot(viewingAngleDeg,C(modelLevel,:),'-','Color',[1 0 0]);
     RMSE = sqrt(mean((C(modelLevel,:)-mathurEq11(viewingAngleDeg)).^2));
     text(0,-0.1,sprintf('RMSE = %1.0e',RMSE),'HorizontalAlignment','Center');
-
+    
     pbaspect([1 1.5 1])
     xlim([-90 90]);
     ylim([-.2 1.1]);
@@ -128,12 +143,10 @@ end
 
 
 figure
-    plot(viewingAngleDeg,pupilFitError(nModels,:),'-','Color',[1 0 0]);
-    axis square
-    xlim([-90 90]);
-    ylim([0 1]);
-    xlabel('Viewing angle [deg]')
-    ylabel('Elliptical fit error')
-    title(titleStrings{modelLevel})
-
-    
+plot(viewingAngleDeg,pupilFitError(nModels,:)./pixelsPerMM,'-','Color',[1 0 0]);
+axis square
+xlim([-90 90]);
+ylim([0 0.05]);
+xlabel('Viewing angle [deg]')
+ylabel('Elliptical fit error')
+title(titleStrings{modelLevel})

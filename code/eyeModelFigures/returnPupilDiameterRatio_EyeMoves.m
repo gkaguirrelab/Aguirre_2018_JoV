@@ -1,7 +1,10 @@
 function [diamRatio, C, pupilFitError, theta, horizPixels, vertPixels] = returnPupilDiameterRatio_EyeMoves(rotationAngleDeg,pupilDiam,sceneGeometry)
 
-azimuthDeg = rotationAngleDeg-sceneGeometry.eye.axes.visual.degField(1);
-elevationDeg = zeros(size(rotationAngleDeg))-sceneGeometry.eye.axes.visual.degField(2);
+% Setup the camera position and rotation properties
+sceneGeometry.cameraPosition.translation = [0; 0; 100];
+
+azimuthDeg = rotationAngleDeg+sceneGeometry.eye.axes.visual.degField(1);
+elevationDeg = zeros(size(rotationAngleDeg))+sceneGeometry.eye.axes.visual.degField(2);
 
 % Assemble the eyePose
 eyePose=[azimuthDeg elevationDeg 0 pupilDiam/2];

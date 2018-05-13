@@ -78,6 +78,12 @@ ylabel('Turning point beta [deg]');
 % Plot our model
 plot(ametropiaValues,betas,'-r')
 
+% Get the slope and intrercept of a line fit to our model output
+linearCoefficients = polyfit(ametropiaValues, betas, 1)
+
+
 % Plot their fit to the data
 mathurFit = @(x) -5.8 - 0.61*x;
 plot(ametropiaValues,mathurFit(ametropiaValues),'-k')
+
+linearCoefficients = polyfit(mathurData(1,:), mathurData(2,:), 1)
