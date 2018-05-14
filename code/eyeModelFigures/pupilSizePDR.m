@@ -7,8 +7,6 @@ viewingAngleDeg = -65:1:55;
 % The refractive error of the subject for the average Mathur data.
 sphericalAmetropia = -0.7;
 
-
-clear diamRatios
 sg = createSceneGeometry('sphericalAmetropia',sphericalAmetropia,'spectralDomain','vis');
 sgNoRayTrace = sg;
 sgNoRayTrace.refraction = [];
@@ -17,7 +15,9 @@ sgNoRayTrace.refraction = [];
 % the turning point (beta).
 mathurEq7 = fittype( @(beta,D,E,x) D.*cosd((x-beta)./E), 'independent','x','dependent','y');
 
+figure
 
+clear diamRatios E
 for entrancePupilDiameter = 1:7
     entranceRadius = entrancePupilDiameter/2;
     % Obtain the pupil area in the image for the entrance radius
@@ -38,23 +38,74 @@ for entrancePupilDiameter = 1:7
 end
 
 % Plot the results.
-figure
-hold on
-for entrancePupilDiameter = 1:2:7
-    plot(viewingAngleDeg,diamRatios(entrancePupilDiameter,:),'-','Color',[1./(7/entrancePupilDiameter) 0 0]);
-    pbaspect([1 1.5 1])
-end
-xlim([-90 90]);
-ylim([-.2 1.1]);
-xlabel('Viewing angle [deg]')
-ylabel('Pupil Diameter Ratio')
-
-figure
+subplot(3,1,1)
 plot(1:7,E,'ok')
 hold on
 cs = spline(1:7,E);
-plot(0.5:0.1:8,ppval(cs,0.5:0.1:8),'-r')
+plot(1:0.1:7,ppval(cs,1:0.1:7),'-r')
 xlabel('Entrance pupil diameter [mm]')
 ylabel('E')
-xlim([0 10]);
+xlim([0 8]);
 ylim([0.9 1.2]);
+
+
+%% Vary pupil depth
+clear diamRatios E
+sg = createSceneGeometry('sphericalAmetropia',sphericalAmetropia,'spectralDomain','vis');
+pupilDepths = -4:0.2:-2.8;
+for pd = 1:length(pupilDepths)
+    sg.eye.pupil.center(1)=pupilDepths(pd);
+    for vv = 1:length(viewingAngleDeg)
+        diamRatios(entrancePupilDiameter,vv) = returnPupilDiameterRatio_CameraMoves(viewingAngleDeg(vv),2.6453*2,sg);
+    end
+    eq7Fit = fit (viewingAngleDeg',diamRatios(entrancePupilDiameter,:)',mathurEq7,'StartPoint',[5.3,0.93,1.12]);
+    E(pd)=eq7Fit.E;
+end
+subplot(3,1,2)
+plot(pupilDepths,E,'ok')
+hold on
+cs = spline(pupilDepths,E);
+plot(pupilDepths,ppval(cs,pupilDepths),'-r')
+xlabel('Pupil depths [mm]')
+ylabel('E')
+xlim([-4.2 -2.6]);
+ylim([0.9 1.2]);
+
+
+%% Vary iris thickness depth
+clear diamRatios E
+sg = createSceneGeometry('sphericalAmetropia',sphericalAmetropia,'spectralDomain','vis');
+irisThickness = 0:0.05:.3;
+for it = 1:length(irisThickness)
+    sg.eye.iris.thickness=irisThickness(it);
+    for vv = 1:length(viewingAngleDeg)
+        diamRatios(entrancePupilDiameter,vv) = returnPupilDiameterRatio_CameraMoves(viewingAngleDeg(vv),2.6453*2,sg);
+    end
+    eq7Fit = fit (viewingAngleDeg',diamRatios(entrancePupilDiameter,:)',mathurEq7,'StartPoint',[5.3,0.93,1.12]);
+    E(it)=eq7Fit.E;
+end
+subplot(3,1,3)
+plot(irisThickness,E,'ok')
+hold on
+cs = spline(irisThickness,E);
+plot(irisThickness,ppval(cs,irisThickness),'-r')
+xlabel('Iris thickness [mm]')
+ylabel('E')
+xlim([-0.05 0.35]);
+ylim([0.9 1.2]);
+
+
+
+
+%% Compare the PDR fits for vertical and horizontal eye rotation, and with turning off the corneal rotation
+% sg = createSceneGeometry('sphericalAmetropia',sphericalAmetropia,'spectralDomain','vis');
+% clear diamRatios E
+% for vv = 1:length(viewingAngleDeg)
+%     diamRatios(vv) = returnPupilDiameterRatio_CameraMoves(viewingAngleDeg(vv),2.6453*2,sg);
+% end
+% eq7Fit = fit (viewingAngleDeg',diamRatios',mathurEq7,'StartPoint',[5.3,0.93,1.12])
+
+%% I manually hacked the code to examine the following values:
+% Horizontal viewing angle: [beta, D, E] = -5.293, 0.9842, 1.137
+% Vertical viewing angle: [beta, D, E] = -2.172, 0.9938. 1.185
+% Horizontal viewing angle, no corneal rotation = -5.292, 0.9842, 1.137

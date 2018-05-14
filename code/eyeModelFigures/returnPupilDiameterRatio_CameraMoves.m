@@ -18,6 +18,7 @@ sceneGeometry.eye.rotationCenters.ele = [0 0 0];
 azimuthDeg = (-viewingAngleDeg)-sceneGeometry.eye.axes.visual.degField(1);
 elevationDeg = zeros(size(viewingAngleDeg))-sceneGeometry.eye.axes.visual.degField(2);
 
+
 % Assemble the eyePose
 eyePose=[azimuthDeg elevationDeg 0 pupilDiam/2];
 
