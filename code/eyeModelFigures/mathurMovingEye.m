@@ -44,3 +44,32 @@ for modelLevel = 1:nModels
     title(titleStrings{modelLevel})
     pbaspect([1 1.5 1])
 end
+
+
+% Obtain the E value for eyes of different refractive errors
+
+% Mathur 2013 Equation 7. Used to fit the pupil diameter values and extract
+% the turning point (beta).
+mathurEq7 = fittype( @(beta,D,E,x) D.*cosd((x-beta)./E), 'independent','x','dependent','y');
+
+clear diamRatios E
+SRvals = -10:3:5;
+for sr = 1:length(SRvals)
+    sg = createSceneGeometry('sphericalAmetropia',SRvals(sr));
+    for vv = 1:length(rotationAngleDeg)
+        diamRatios(vv) = returnPupilDiameterRatio_EyeMoves(rotationAngleDeg(vv),actualPupilDiam,sg);
+    end
+    eq7Fit = fit (rotationAngleDeg',diamRatios',mathurEq7,'StartPoint',[5.3,0.93,1.12]);
+    E(sr)=eq7Fit.E;
+end
+
+figure
+plot(SRvals,E,'ok')
+hold on
+cs = spline(SRvals,E);
+plot(SRvals,ppval(cs,SRvals),'-r')
+xlabel('SR [diopters]')
+ylabel('E')
+xlim([-11 6]);
+ylim([0.9 1.2]);
+

@@ -87,3 +87,22 @@ mathurFit = @(x) -5.8 - 0.61*x;
 plot(ametropiaValues,mathurFit(ametropiaValues),'-k')
 
 linearCoefficients = polyfit(mathurData(1,:), mathurData(2,:), 1)
+
+
+
+% Plot a few PDRs with different beta values
+figure
+mathurEq7Plot = @(beta,D,E,x) D.*cosd((x-beta)./E);
+
+clear E
+for beta = -2:-2:-8
+    plot(viewingAngleDeg,mathurEq7Plot(beta, 0.9842, 1.137, viewingAngleDeg));
+    hold on
+end
+pbaspect([1 1.5 1])
+xlim([-90 90]);
+ylim([-.2 1.1]);
+xlabel('Viewing angle [deg]')
+ylabel('Pupil Diameter Ratio')
+
+    

@@ -150,3 +150,9 @@ ylim([0 0.05]);
 xlabel('Viewing angle [deg]')
 ylabel('Elliptical fit error')
 title(titleStrings{modelLevel})
+
+
+%% Report the parameters of Mathur Eq 7 fit to the model diam ratios
+for modelLevel = 1:nModels
+        f = fit (viewingAngleDeg',diamRatios(modelLevel,:)',mathurEq7,'StartPoint',[5.3,0.93,1.12])
+end

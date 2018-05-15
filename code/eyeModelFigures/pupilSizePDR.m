@@ -1,4 +1,4 @@
-% Variation in PDR function width with pupil diameter
+% Variation in PDR function width with biometric variation
 
 
 % The range for our plots
@@ -95,6 +95,20 @@ xlim([-0.05 0.35]);
 ylim([0.9 1.2]);
 
 
+% Plot a few PDRs with different E values
+figure
+mathurEq7Plot = @(beta,D,E,x) D.*cosd((x-beta)./E);
+
+clear E
+for E = 0.9:.1:1.2
+plot(viewingAngleDeg,mathurEq7Plot(-5.293, 0.9842, E, viewingAngleDeg));
+hold on
+end
+    pbaspect([1 1.5 1])
+    xlim([-90 90]);
+    ylim([-.2 1.1]);
+    xlabel('Viewing angle [deg]')
+    ylabel('Pupil Diameter Ratio / obliquity')
 
 
 %% Compare the PDR fits for vertical and horizontal eye rotation, and with turning off the corneal rotation
