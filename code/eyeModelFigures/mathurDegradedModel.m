@@ -4,7 +4,7 @@
 % components of the model.
 
 % The range for our plots
-viewingAngleDeg = -70:1:60;
+viewingAngleDeg = -70:1:58;
 
 % The refractive error of the subject for the average Mathur data.
 sphericalAmetropia = -0.7;
