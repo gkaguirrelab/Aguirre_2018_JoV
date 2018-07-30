@@ -26,7 +26,7 @@ eyePose=[azimuthDeg elevationDeg 0 pupilDiam/2];
 % the pupil is located in the sceneWorld coordinates
 sceneGeometryNoRefract = sceneGeometry;
 sceneGeometryNoRefract.refraction = [];
-[~, ~, worldPoints, ~, pointLabels] = pupilProjection_fwd(eyePose, sceneGeometryNoRefract,'fullEyeModelFlag',true);
+[~, ~, worldPoints, ~, pointLabels] = pupilProjection_fwd(eyePose, sceneGeometryNoRefract,'fullEyeModelFlag',true,'anteriorChamberMeshDensity',1,'posteriorChamberMeshDensity',1);
 idx = strcmp(pointLabels,'pupilCenter');
 pupilCenter = worldPoints(idx,:);
 
