@@ -4,7 +4,7 @@
 % components of the model.
 
 % The range for our plots
-viewingAngleDeg = -65:1:55;
+viewingAngleDeg = -70:1:60;
 
 % The refractive error of the subject for the average Mathur data.
 sphericalAmetropia = -0.7;
@@ -20,36 +20,35 @@ sphericalAmetropia = -0.7;
 %
 entrancePupilDiam = 6;
 %{
-            entranceRadius = 6/2;
-            % Prepare scene geometry and eye pose aligned with visual axis
-            sceneGeometry = createSceneGeometry();
-            % Obtain the pupil area in the image for the entrance radius
-            % assuming no ray tracing
-            sceneGeometry.refraction = [];
-            pupilImage = pupilProjection_fwd([0, 0, 0, entranceRadius],sceneGeometry);
-            actualArea = pupilImage(3);
-            % Add the ray tracing function to the sceneGeometry
-            sceneGeometry = createSceneGeometry();
-            % Search across actual pupil radii to find the value that matches
-            % the observed entrance area.
-            myPupilEllipse = @(radius) pupilProjection_fwd([0, 0, 0, radius],sceneGeometry);
-            myArea = @(ellipseParams) ellipseParams(3);
-            myObj = @(radius) (myArea(myPupilEllipse(radius))-actualArea(1)).^2;
-            actualRadius = fminunc(myObj, entranceRadius)
+    entranceRadius = 6/2;
+    % Prepare scene geometry and eye pose aligned with visual axis
+    sceneGeometry = createSceneGeometry();
+    % Obtain the pupil area in the image for the entrance radius
+    % assuming no ray tracing
+    sceneGeometry.refraction = [];
+    pupilImage = pupilProjection_fwd([0, 0, 0, entranceRadius],sceneGeometry);
+    actualArea = pupilImage(3);
+    % Add the ray tracing function to the sceneGeometry
+    sceneGeometry = createSceneGeometry();
+    % Search across actual pupil radii to find the value that matches
+    % the observed entrance area.
+    myPupilEllipse = @(radius) pupilProjection_fwd([0, 0, 0, radius],sceneGeometry);
+    myArea = @(ellipseParams) ellipseParams(3);
+    myObj = @(radius) (myArea(myPupilEllipse(radius))-actualArea(1)).^2;
+    actualRadius = fminunc(myObj, entranceRadius)
 %}
-actualPupilDiam = 2.6453*2;
+actualPupilDiam = 2.6383*2;
 
 %{
     % Probe the forward model at the estimated pose angles to
     % estimate the pupil radius.
     sceneGeometry = createSceneGeometry();
     sceneGeometry.cameraPosition.translation = [0; 0; 100];
-    eyePose = [-sceneGeometry.eye.axes.visual.degRetina 2];
+    eyePose = [-sceneGeometry.eye.axes.visual.degField 2];
     probeEllipse=pupilProjection_fwd(eyePose, sceneGeometry);
     pixelsPerMM = sqrt(probeEllipse(3)/pi)/2;
 %}
-pixelsPerMM = 28.3544;
-
+pixelsPerMM = 28.5769;
 
 nModels = 5;
 
@@ -70,10 +69,9 @@ for modelLevel = 1:nModels
         case 3
             sg = createSceneGeometry('sphericalAmetropia',sphericalAmetropia,'spectralDomain','vis');
             sg.eye.pupil.eccenFcnString = '@(x) 0';
-            sg.eye.iris.thickness = 0;
         case 4
             sg = createSceneGeometry('sphericalAmetropia',sphericalAmetropia,'spectralDomain','vis');
-            sg.eye.pupil.eccenFcnString = '@(x) 0';
+            sg.eye.iris.thickness = 0;
         case 5
             sg = createSceneGeometry('sphericalAmetropia',sphericalAmetropia,'spectralDomain','vis');
     end
@@ -116,7 +114,7 @@ fedtkeFit = fit (fedtkeFig9Data(1,:)',fedtkeFig9Data(2,:)',mathurEq7Fedtke,'Star
 % Plot the results.
 figure
 
-titleStrings = {'no model','add alpha','add ray trace','add iris thickness','add non-circular pupil aperture',};
+titleStrings = {'no model','add alpha','add ray trace','add non-circular pupil aperture','add iris thickness'};
 for modelLevel = 1:nModels
     subplot(3,2,modelLevel);
     hold on
@@ -154,5 +152,5 @@ title(titleStrings{modelLevel})
 
 %% Report the parameters of Mathur Eq 7 fit to the model diam ratios
 for modelLevel = 1:nModels
-        f = fit (viewingAngleDeg',diamRatios(modelLevel,:)',mathurEq7,'StartPoint',[5.3,0.93,1.12])
+        f = fit (viewingAngleDeg',diamRatios(modelLevel,:)',mathurEq7,'StartPoint',[5.3,0.93,1.12]);
 end
