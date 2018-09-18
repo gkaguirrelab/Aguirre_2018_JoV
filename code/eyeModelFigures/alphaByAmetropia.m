@@ -31,7 +31,7 @@ plot(hashemiData(1,:),hashemiData(2,:),'or');
 plot(taberneroData(1,:),taberneroData(2,:),'ob');
 
 % Add our model fit
-sphericalAmetropias = -15:1:5;
+sphericalAmetropias = -10:1:5;
 clear alphaAzi alphaEle
 for aa = 1:length(sphericalAmetropias)
     eye = modelEyeParameters('sphericalAmetropia',sphericalAmetropias(aa));
@@ -41,7 +41,7 @@ end
 plot(sphericalAmetropias,alphaAzi,'-r')
 
 % Add the Tabernero model
-sphericalAmetropias = -15:1:5;
+sphericalAmetropias = -10:1:5;
 clear alphaAzi alphaEle
 for aa = 1:length(sphericalAmetropias)
     % This visual axis yeild an azimuth alpha of 5 deg in the
