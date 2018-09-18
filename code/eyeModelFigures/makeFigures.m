@@ -10,8 +10,14 @@ corneaRayTrace
 saveThatSucker('corneaRayTrace.pdf');
 
 %% mathurDegradedModel
+plotEllipseFitError=false;
 mathurDegradedModel
 saveThatSucker('mathurDegradedModel.pdf');
+
+%% mathurDegradedModel ellipse fit error
+plotEllipseFitError=true;
+mathurDegradedModel
+saveThatSucker('ellipseFitError.pdf');
 
 %% turningPointByAmetropia
 turningPointByAmetropia

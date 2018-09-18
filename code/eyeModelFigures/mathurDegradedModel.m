@@ -7,7 +7,8 @@
 viewingAngleDeg = -70:1:58;
 
 % The refractive error of the subject for the average Mathur data.
-sphericalAmetropia = -0.7;
+% SR = -0.823
+sphericalAmetropia = (6*1.2-11*2.9)/30;
 
 % The size of the actual pupil
 % The eye was dilated with 1% Cyclopentolate which in adults produces an
@@ -139,16 +140,18 @@ for modelLevel = 1:nModels
     title(titleStrings{modelLevel})
 end
 
-
-figure
-plot(viewingAngleDeg,pupilFitError(nModels,:)./pixelsPerMM,'-','Color',[1 0 0]);
-axis square
-xlim([-90 90]);
-ylim([0 0.05]);
-xlabel('Viewing angle [deg]')
-ylabel('Elliptical fit error')
-title(titleStrings{modelLevel})
-
+if exist('plotEllipseFitError','var')==1
+    if plotEllipseFitError
+        figure
+        plot(viewingAngleDeg,pupilFitError(nModels,:)./pixelsPerMM,'-','Color',[1 0 0]);
+        axis square
+        xlim([-90 90]);
+        ylim([0 0.05]);
+        xlabel('Viewing angle [deg]')
+        ylabel('Elliptical fit error')
+        title(titleStrings{modelLevel})
+    end
+end
 
 %% Report the parameters of Mathur Eq 7 fit to the model diam ratios
 for modelLevel = 1:nModels

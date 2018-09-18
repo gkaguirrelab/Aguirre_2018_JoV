@@ -17,8 +17,8 @@ sceneGeometry.eye.rotationCenters.ele = [0 0 0];
 
 viewingAngleDeg = -65:30:55;
 
-modelEyeLabelNames = {'posteriorChamber' 'posteriorChamber_hidden' 'irisPerimeter' 'pupilPerimeterFront' 'pupilPerimeterBack' 'pupilEllipse' 'pupilCenter' 'anteriorChamber'};
-modelEyePlotColors = {'.w' '.w' '.b' '*g' '*g' '-g' '+r' '.y'};
+modelEyeLabelNames = {'retina' 'retina_hidden' 'irisPerimeter' 'pupilPerimeter' 'pupilEllipse' 'cornea'};
+modelEyePlotColors = {'.w' '.w' 'ob' '*g' '-g' '.y'};
 
 
 for vv = 1:length(viewingAngleDeg)
