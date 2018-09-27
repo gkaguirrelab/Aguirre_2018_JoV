@@ -5,6 +5,10 @@
 modelEyeFigure
 saveThatSucker('modelEyeFigure.pdf');
 
+%% modelEyeFigure3D
+modelEyeFigure3D
+saveThatSucker('modelEyeFigure3D.png');
+
 %% Ray tracing through the cornea
 corneaRayTrace
 saveThatSucker('corneaRayTrace.pdf');

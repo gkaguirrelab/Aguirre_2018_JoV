@@ -4,10 +4,9 @@
 % components of the model.
 
 % The range for our plots
-viewingAngleDeg = -70:1:58;
+viewingAngleDeg = -70:1:65;
 
 % The refractive error of the subject for the average Mathur data.
-% SR = -0.823
 sphericalAmetropia = (6*1.2-11*2.9)/30;
 
 % The size of the actual pupil
@@ -72,7 +71,6 @@ for modelLevel = 1:nModels
             sg.eye.pupil.eccenFcnString = '@(x) 0';
         case 4
             sg = createSceneGeometry('sphericalAmetropia',sphericalAmetropia,'spectralDomain','vis');
-            sg.eye.iris.thickness = 0;
         case 5
             sg = createSceneGeometry('sphericalAmetropia',sphericalAmetropia,'spectralDomain','vis');
     end

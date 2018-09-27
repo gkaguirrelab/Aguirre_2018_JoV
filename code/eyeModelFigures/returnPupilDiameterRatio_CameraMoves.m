@@ -38,7 +38,7 @@ adjustedSceneGeometry = sceneGeometry;
 adjustedSceneGeometry.cameraPosition.translation = adjustedSceneGeometry.cameraPosition.translation+pupilCenter';
 
 % Now, measure the pupil diameter ratio
-[pupilEllipseOnImagePlane, imagePoints, ~, ~, ~, ~, pupilFitError] = pupilProjection_fwd(eyePose, adjustedSceneGeometry,'nPupilPerimPoints',16);
+[pupilEllipseOnImagePlane, imagePoints, ~, ~, ~, ~, pupilFitError] = pupilProjection_fwd(eyePose, adjustedSceneGeometry,'nPupilPerimPoints',16,'modelIrisThickness',true);
 theta = pupilEllipseOnImagePlane(5);
 
 p = ellipse_transparent2ex(pupilEllipseOnImagePlane);
