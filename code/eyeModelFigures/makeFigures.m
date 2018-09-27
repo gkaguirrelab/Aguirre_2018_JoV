@@ -26,11 +26,3 @@ saveThatSucker('ellipseFitError.pdf');
 %% turningPointByAmetropia
 turningPointByAmetropia
 saveThatSucker('turningPointByAmetropia.pdf');
-
-%% alphaByAmetropia
-alphaByAmetropia
-saveThatSucker('alphaByAmetropia.pdf');
-
-%% mathurMovingEye
-mathurMovingEye
-saveThatSucker('mathurMovingEye.pdf');
