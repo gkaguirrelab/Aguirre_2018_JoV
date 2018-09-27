@@ -76,7 +76,10 @@ xlabel('Refraction [D]');
 ylabel('Turning point beta [deg]');
 
 % Plot our model
+plot(ametropiaValues,betas,'xr')
+hold on
 plot(ametropiaValues,betas,'-r')
+
 
 % Get the slope and intrercept of a line fit to our model output
 linearCoefficients = polyfit(ametropiaValues, betas, 1)
