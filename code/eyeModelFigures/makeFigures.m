@@ -23,7 +23,10 @@ turningPointByAmetropia
 saveThatSucker(figHandle1,'turningPointByAmetropia_A.pdf');
 saveThatSucker(figHandle2,'turningPointByAmetropia_B.pdf');
 
-%% pupilSizePDR
+%% pdrByBiometry
+pdrByBiometry
+saveThatSucker(figHandle1,'pdrByBiometry_A.pdf');
+saveThatSucker(figHandle2,'pdrByBiometry_B.pdf');
 
 
 
