@@ -45,7 +45,7 @@ mathurData = [-4.943273905996759, -0.8298755186722002
 2.181523500810374, -7.572614107883817]';
 
 
-viewingAngleDeg = -60:10:60;
+viewingAngleDeg = -70:1:65;
 exitPupilDiam = 2.6330*2;
 
 % Derive the axial length of the eye for each of several ametropia values
@@ -68,6 +68,7 @@ for aa = 1:length(ametropiaValues)
 end
 
 % Plot the mathur data
+figHandle1 = figure();
 plot(mathurData(1,:),mathurData(2,:),'ok','MarkerSize',10);
 hold on
 xlim([-5 2.5]);
@@ -93,11 +94,11 @@ linearCoefficients = polyfit(mathurData(1,:), mathurData(2,:), 1)
 
 
 % Plot a few PDRs with different beta values
-figure
+figHandle2 = figure();
 mathurEq7Plot = @(beta,D,E,x) D.*cosd((x-beta)./E);
 
 clear E
-for beta = -2:-2:-8
+for beta = [-2, -8]
     plot(viewingAngleDeg,mathurEq7Plot(beta, 0.9842, 1.137, viewingAngleDeg));
     hold on
 end

@@ -2,10 +2,10 @@
 
 
 % The range for our plots
-viewingAngleDeg = -65:1:55;
+viewingAngleDeg = -70:1:65;
 
 % The refractive error of the subject for the average Mathur data.
-sphericalAmetropia = -0.7;
+sphericalAmetropia = (6*1.2-11*2.9)/30;
 
 sg = createSceneGeometry('sphericalAmetropia',sphericalAmetropia,'spectralDomain','vis');
 sgNoRayTrace = sg;
@@ -15,7 +15,7 @@ sgNoRayTrace.refraction = [];
 % the turning point (beta).
 mathurEq7 = fittype( @(beta,D,E,x) D.*cosd((x-beta)./E), 'independent','x','dependent','y');
 
-figure
+figHandle1 = figure();
 
 clear diamRatios E
 for entrancePupilDiameter = 1:7
@@ -72,31 +72,30 @@ xlim([-4.2 -2.6]);
 ylim([0.9 1.2]);
 
 
-%% Vary iris thickness depth
+%% Vary eye Torsion
 clear diamRatios E
 sg = createSceneGeometry('sphericalAmetropia',sphericalAmetropia,'spectralDomain','vis');
-irisThickness = 0:0.05:.3;
-for it = 1:length(irisThickness)
-    sg.eye.iris.thickness=irisThickness(it);
+eyeTorsion = 0:15:90;
+for it = 1:length(eyeTorsion)
     for vv = 1:length(viewingAngleDeg)
-        diamRatios(entrancePupilDiameter,vv) = returnPupilDiameterRatio_CameraMoves(viewingAngleDeg(vv),2.6453*2,sg);
+        diamRatios(entrancePupilDiameter,vv) = returnPupilDiameterRatio_CameraMoves(viewingAngleDeg(vv),2.6453*2,sg,eyeTorsion(it));
     end
     eq7Fit = fit (viewingAngleDeg',diamRatios(entrancePupilDiameter,:)',mathurEq7,'StartPoint',[5.3,0.93,1.12]);
     E(it)=eq7Fit.E;
 end
 subplot(3,1,3)
-plot(irisThickness,E,'ok')
+plot(eyeTorsion,E,'ok')
 hold on
 cs = spline(irisThickness,E);
 plot(irisThickness,ppval(cs,irisThickness),'-r')
 xlabel('Iris thickness [mm]')
 ylabel('E')
-xlim([-0.05 0.35]);
+xlim([-0.5 95]);
 ylim([0.9 1.2]);
 
 
 % Plot a few PDRs with different E values
-figure
+figHandle2 = figure();
 mathurEq7Plot = @(beta,D,E,x) D.*cosd((x-beta)./E);
 
 clear E
@@ -112,12 +111,14 @@ end
 
 
 %% Compare the PDR fits for vertical and horizontal eye rotation, and with turning off the corneal rotation
-% sg = createSceneGeometry('sphericalAmetropia',sphericalAmetropia,'spectralDomain','vis');
-% clear diamRatios E
-% for vv = 1:length(viewingAngleDeg)
-%     diamRatios(vv) = returnPupilDiameterRatio_CameraMoves(viewingAngleDeg(vv),2.6453*2,sg);
-% end
-% eq7Fit = fit (viewingAngleDeg',diamRatios',mathurEq7,'StartPoint',[5.3,0.93,1.12])
+%{
+    sg = createSceneGeometry('sphericalAmetropia',sphericalAmetropia,'spectralDomain','vis');
+    clear diamRatios E
+    for vv = 1:length(viewingAngleDeg)
+        diamRatios(vv) = returnPupilDiameterRatio_CameraMoves(viewingAngleDeg(vv),2.6453*2,sg);
+    end
+    eq7Fit = fit (viewingAngleDeg',diamRatios',mathurEq7,'StartPoint',[5.3,0.93,1.12])
+%}
 
 %% I manually hacked the code to examine the following values:
 % Horizontal viewing angle: [beta, D, E] = -5.293, 0.9842, 1.137

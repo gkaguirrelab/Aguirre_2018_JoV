@@ -111,7 +111,7 @@ fedtkeFit = fit (fedtkeFig9Data(1,:)',fedtkeFig9Data(2,:)',mathurEq7Fedtke,'Star
 %}
 
 % Plot the results.
-figure
+figHandle1 = figure();
 
 titleStrings = {'no model','add alpha','add ray trace','add non-circular pupil aperture','add iris thickness'};
 for modelLevel = 1:nModels
@@ -138,20 +138,16 @@ for modelLevel = 1:nModels
     title(titleStrings{modelLevel})
 end
 
-if exist('plotEllipseFitError','var')==1
-    if plotEllipseFitError
-        figure
-        plot(viewingAngleDeg,pupilFitError(nModels,:)./pixelsPerMM,'-','Color',[1 0 0]);
-        axis square
-        xlim([-90 90]);
-        ylim([0 0.05]);
-        xlabel('Viewing angle [deg]')
-        ylabel('Elliptical fit error')
-        title(titleStrings{modelLevel})
-    end
-end
+figHandle2 = figure();
+plot(viewingAngleDeg,pupilFitError(nModels,:)./pixelsPerMM,'-','Color',[1 0 0]);
+axis square
+xlim([-90 90]);
+ylim([0 0.05]);
+xlabel('Viewing angle [deg]')
+ylabel('Elliptical fit error')
+title(titleStrings{modelLevel})
 
 %% Report the parameters of Mathur Eq 7 fit to the model diam ratios
 for modelLevel = 1:nModels
-        f = fit (viewingAngleDeg',diamRatios(modelLevel,:)',mathurEq7,'StartPoint',[5.3,0.93,1.12]);
+    f = fit (viewingAngleDeg',diamRatios(modelLevel,:)',mathurEq7,'StartPoint',[5.3,0.93,1.12]);
 end

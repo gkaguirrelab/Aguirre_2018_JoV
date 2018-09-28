@@ -1,4 +1,8 @@
-function [diamRatio, C, pupilFitError, theta, horizPixels, vertPixels] = returnPupilDiameterRatio_CameraMoves(viewingAngleDeg,pupilDiam,sceneGeometry)
+function [diamRatio, C, pupilFitError, theta, horizPixels, vertPixels] = returnPupilDiameterRatio_CameraMoves(viewingAngleDeg,pupilDiam,sceneGeometry,torsionDeg)
+
+if nargin==3
+    torsionDeg = 0;
+end
 
 % Setup the camera position and rotation properties
 sceneGeometry.cameraPosition.translation = [0; 0; 100];
@@ -20,7 +24,7 @@ elevationDeg = zeros(size(viewingAngleDeg))-sceneGeometry.eye.axes.visual.degFie
 
 
 % Assemble the eyePose
-eyePose=[azimuthDeg elevationDeg 0 pupilDiam/2];
+eyePose=[azimuthDeg elevationDeg torsionDeg pupilDiam/2];
 
 % First, perform the forward projection to determine where the center of
 % the pupil is located in the sceneWorld coordinates
@@ -38,7 +42,7 @@ adjustedSceneGeometry = sceneGeometry;
 adjustedSceneGeometry.cameraPosition.translation = adjustedSceneGeometry.cameraPosition.translation+pupilCenter';
 
 % Now, measure the pupil diameter ratio
-[pupilEllipseOnImagePlane, imagePoints, ~, ~, ~, ~, pupilFitError] = pupilProjection_fwd(eyePose, adjustedSceneGeometry,'nPupilPerimPoints',16,'modelIrisThickness',true);
+[pupilEllipseOnImagePlane, imagePoints, ~, ~, ~, ~, pupilFitError] = pupilProjection_fwd(eyePose, adjustedSceneGeometry,'nPupilPerimPoints',16);
 theta = pupilEllipseOnImagePlane(5);
 
 p = ellipse_transparent2ex(pupilEllipseOnImagePlane);

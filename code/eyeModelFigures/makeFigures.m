@@ -3,26 +3,30 @@
 
 %% modelEyeFigure
 modelEyeFigure
-saveThatSucker('modelEyeFigure.pdf');
+saveThatSucker(get(groot,'CurrentFigure'),'modelEyeFigure.pdf');
 
 %% modelEyeFigure3D
 modelEyeFigure3D
-saveThatSucker('modelEyeFigure3D.png');
+saveThatSucker(get(groot,'CurrentFigure'),'modelEyeFigure3D.png');
 
 %% Ray tracing through the cornea
 corneaRayTrace
-saveThatSucker('corneaRayTrace.pdf');
+saveThatSucker(get(groot,'CurrentFigure'),'corneaRayTrace.pdf');
 
 %% mathurDegradedModel
-plotEllipseFitError=false;
 mathurDegradedModel
-saveThatSucker('mathurDegradedModel.pdf');
-
-%% mathurDegradedModel ellipse fit error
-plotEllipseFitError=true;
-mathurDegradedModel
-saveThatSucker('ellipseFitError.pdf');
+saveThatSucker(figHandle1,'mathurDegradedModel.pdf');
+saveThatSucker(figHandle2,'ellipseFitError.pdf');
 
 %% turningPointByAmetropia
 turningPointByAmetropia
-saveThatSucker('turningPointByAmetropia.pdf');
+saveThatSucker(figHandle1,'turningPointByAmetropia_A.pdf');
+saveThatSucker(figHandle2,'turningPointByAmetropia_B.pdf');
+
+%% pupilSizePDR
+
+
+
+
+
+
