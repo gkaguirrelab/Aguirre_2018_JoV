@@ -1,9 +1,9 @@
 
 % The size of the exit pupil
-actualPupilDiam = 2.6451*2;
+actualPupilDiam = 2.6383*2;
 
 % The refractive error of the subject for the average Mathur data.
-sphericalAmetropia = -0.7;
+sphericalAmetropia = (6*1.2-11*2.9)/30;
 
 sensorResolution=[960 720];
 intrinsicCameraMatrix = [2600 0 480; 0 2600 360; 0 0 1];
@@ -17,8 +17,8 @@ sceneGeometry.eye.rotationCenters.ele = [0 0 0];
 
 viewingAngleDeg = -65:30:55;
 
-modelEyeLabelNames = {'retina' 'retina_hidden' 'irisPerimeter' 'pupilPerimeter' 'pupilEllipse' 'cornea'};
-modelEyePlotColors = {'.w' '.w' 'ob' '*g' '-g' '.y'};
+modelEyeLabelNames = {'retina' 'retina_hidden' 'irisPerimeter' 'pupilPerimeter' 'pupilEllipse' 'pupilCenter' 'cornea'};
+modelEyePlotColors = {'.w' '.w' 'ob' '*g' '-g' '+r' '.y'};
 
 
 for vv = 1:length(viewingAngleDeg)
@@ -54,10 +54,10 @@ for vv = 1:length(viewingAngleDeg)
     adjustedSceneGeometry = sceneGeometry;
     adjustedSceneGeometry.cameraPosition.translation = adjustedSceneGeometry.cameraPosition.translation+pupilCenter';
     
-    renderEyePose(eyePose, adjustedSceneGeometry,'modelEyeLabelNames',modelEyeLabelNames,'modelEyePlotColors',modelEyePlotColors);
+    figHandle=renderEyePose(eyePose, adjustedSceneGeometry,'modelEyeLabelNames',modelEyeLabelNames,'modelEyePlotColors',modelEyePlotColors,'nPupilPerimPoints',16);
     
     figureName=['cameraMoves_' num2str(viewingAngleDeg(vv)) '.pdf'];
     
-    saveThatSucker(figureName)
+    saveThatSucker(figHandle,figureName)
     
 end

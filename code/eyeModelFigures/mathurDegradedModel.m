@@ -71,6 +71,7 @@ for modelLevel = 1:nModels
             sg.eye.pupil.eccenFcnString = '@(x) 0';
         case 4
             sg = createSceneGeometry('sphericalAmetropia',sphericalAmetropia,'spectralDomain','vis');
+            sg.eye.iris.thickness = 0;
         case 5
             sg = createSceneGeometry('sphericalAmetropia',sphericalAmetropia,'spectralDomain','vis');
     end
@@ -113,7 +114,7 @@ fedtkeFit = fit (fedtkeFig9Data(1,:)',fedtkeFig9Data(2,:)',mathurEq7Fedtke,'Star
 % Plot the results.
 figHandle1 = figure();
 
-titleStrings = {'no model','add alpha','add ray trace','add non-circular pupil aperture','add iris thickness'};
+titleStrings = {'no model','add alpha','add ray trace','add non-circular pupil aperture','cornea only'};
 for modelLevel = 1:nModels
     subplot(3,2,modelLevel);
     hold on
