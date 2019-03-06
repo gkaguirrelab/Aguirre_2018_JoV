@@ -4,7 +4,7 @@
 		"hook": "",
 		"importance": "",
 		"localHookTemplate": "configuration/Aguirre_2018_NatSciReportsLocalHook",
-		"name": "Aguirre_2018_NatSciReports",
+		"name": "Aguirre_2019_NatSciReports",
 		"pathPlacement": "append",
 		"subfolder": "code",
 		"toolboxRoot": "",
