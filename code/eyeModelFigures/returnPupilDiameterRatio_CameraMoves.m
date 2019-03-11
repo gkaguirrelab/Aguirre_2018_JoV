@@ -1,4 +1,4 @@
-function [diamRatio, C, pupilFitError, theta, horizPixels, vertPixels] = returnPupilDiameterRatio_CameraMoves(viewingAngleDeg,pupilDiam,sceneGeometry,torsionDeg)
+function [diamRatio, C, pupilFitError, theta, horizPixels, vertPixels] = returnPupilDiameterRatio_CameraMoves(viewingAngleDeg,fixationAngles,stopDiam,sceneGeometry,torsionDeg)
 
 if nargin==3
     torsionDeg = 0;
@@ -19,30 +19,28 @@ sceneGeometry.eye.rotationCenters.ele = [0 0 0];
 % the eye. The coordinates of our model eye are based around the pupil
 % axis. Therfore, we need to calculate a rotation that accounts for the
 % Mathur viewing angle and alpha.
-azimuthDeg = (-viewingAngleDeg)-sceneGeometry.eye.axes.visual.degField(1);
-elevationDeg = zeros(size(viewingAngleDeg))-sceneGeometry.eye.axes.visual.degField(2);
+azimuthDeg = (-viewingAngleDeg)-fixationAngles(1);
+elevationDeg = zeros(size(viewingAngleDeg))-fixationAngles(2);
 
 
 % Assemble the eyePose
-eyePose=[azimuthDeg elevationDeg torsionDeg pupilDiam/2];
+eyePose=[azimuthDeg elevationDeg torsionDeg stopDiam/2];
 
 % First, perform the forward projection to determine where the center of
-% the pupil is located in the sceneWorld coordinates
-sceneGeometryNoRefract = sceneGeometry;
-sceneGeometryNoRefract.refraction = [];
-[~, ~, worldPoints, ~, pointLabels] = pupilProjection_fwd(eyePose, sceneGeometryNoRefract,'fullEyeModelFlag',true,'anteriorChamberMeshDensity',1,'posteriorChamberMeshDensity',1);
-idx = strcmp(pointLabels,'pupilCenter');
-pupilCenter = worldPoints(idx,:);
+% the entrance pupil is located in the sceneWorld coordinates
+% Obtain the center of the entrance pupil for this eye pose.
+[~, ~, worldPoints, ~, ~, pointLabels] = pupilProjection_fwd(eyePose, sceneGeometry, 'nStopPerimPoints', 16);
+pupilCenter = mean(worldPoints(strcmp(pointLabels,'pupilPerimeter'),:));
 
-% Adjust the sceneGeometry to translate the camera to be centered on
-% geometric center of the pupil center in the sceneWorld space. This is an
-% attempt to match the arrangement of the Mathur study, in which the
-% examiner adjusted the camera to be centered on the pupil.
+% Adjust the sceneGeometry to translate the camera to be centered on the
+% entrance pupil. This is an attempt to match the arrangement of the Mathur
+% study, in which the examiner adjusted the camera to be centered on the
+% pupil.
 adjustedSceneGeometry = sceneGeometry;
 adjustedSceneGeometry.cameraPosition.translation = adjustedSceneGeometry.cameraPosition.translation+pupilCenter';
 
 % Now, measure the pupil diameter ratio
-[pupilEllipseOnImagePlane, imagePoints, ~, ~, ~, ~, pupilFitError] = pupilProjection_fwd(eyePose, adjustedSceneGeometry,'nPupilPerimPoints',16);
+[pupilEllipseOnImagePlane, imagePoints, ~, ~, ~, ~, ~, pupilFitError] = pupilProjection_fwd(eyePose, adjustedSceneGeometry,'nStopPerimPoints',16);
 theta = pupilEllipseOnImagePlane(5);
 
 p = ellipse_transparent2ex(pupilEllipseOnImagePlane);

@@ -9,9 +9,8 @@ viewingAngleDeg = -70:1:65;
 % The refractive error of the subject for the average Mathur data.
 sphericalAmetropia = (6*1.2-11*2.9)/30;
 
-% The size of the actual pupil
-% The eye was dilated with 1% Cyclopentolate which in adults produces an
-% entrance pupil of ~6 mm:
+% The size of the entrance pupil The eye was dilated with 1% Cyclopentolate
+% which in adults produces an entrance pupil of ~6 mm:
 %
 %   Kyei, Samuel, et al. "Onset and duration of cycloplegic action of 1%
 %   Cyclopentolate-1% Tropicamide combination." African health sciences
@@ -27,24 +26,24 @@ entrancePupilDiam = 6;
     % assuming no ray tracing
     sceneGeometry.refraction = [];
     pupilImage = pupilProjection_fwd([0, 0, 0, entranceRadius],sceneGeometry);
-    actualArea = pupilImage(3);
+    stopArea = pupilImage(3);
     % Add the ray tracing function to the sceneGeometry
     sceneGeometry = createSceneGeometry();
-    % Search across actual pupil radii to find the value that matches
-    % the observed entrance area.
+    % Search across stop radii to find the value that matches the observed
+    % entrance area.
     myPupilEllipse = @(radius) pupilProjection_fwd([0, 0, 0, radius],sceneGeometry);
     myArea = @(ellipseParams) ellipseParams(3);
-    myObj = @(radius) (myArea(myPupilEllipse(radius))-actualArea(1)).^2;
-    actualRadius = fminunc(myObj, entranceRadius)
+    myObj = @(radius) (myArea(myPupilEllipse(radius))-stopArea(1)).^2;
+    stopRadius = fminunc(myObj, entranceRadius)
 %}
-actualPupilDiam = 2.6383*2;
+stopDiam = 2.6484*2;
 
 %{
     % Probe the forward model at the estimated pose angles to
     % estimate the pupil radius.
     sceneGeometry = createSceneGeometry();
     sceneGeometry.cameraPosition.translation = [0; 0; 100];
-    eyePose = [-sceneGeometry.eye.axes.visual.degField 2];
+    eyePose = [-sceneGeometry.eye.landmarks.fovea.degField 2];
     probeEllipse=pupilProjection_fwd(eyePose, sceneGeometry);
     pixelsPerMM = sqrt(probeEllipse(3)/pi)/2;
 %}
@@ -52,31 +51,37 @@ pixelsPerMM = 28.5769;
 
 nModels = 5;
 
+sceneGeometry = createSceneGeometry('sphericalAmetropia',sphericalAmetropia,'spectralDomain','vis','calcLandmarkFovea',true);
+[outputRayLoS,rayPathLoS]=calcLineOfSightRay(sceneGeometry,stopDiam/2);
+[azimuth, elevation] = quadric.rayToAngles(outputRayLoS);
+fixationAngles = [azimuth, elevation];
+
 clear diamRatios C
 for modelLevel = 1:nModels
+    sg = sceneGeometry;
+    fa = fixationAngles;
     switch modelLevel
         case 1
-            sg = createSceneGeometry('sphericalAmetropia',sphericalAmetropia,'spectralDomain','vis');
             sg.refraction = [];
-            sg.eye.axes.visual.degField = [0 0 0];
-            sg.eye.pupil.eccenFcnString = '@(x) 0';
-            sg.eye.iris.thickness = 0;
+            fa = [0 0];
+            sg.eye.stop.eccenFcnString = '@(x) 0';
         case 2
-            sg = createSceneGeometry('sphericalAmetropia',sphericalAmetropia,'spectralDomain','vis');
+            % Remove the refractive effects of the anterior segment by
+            % setting all refractive indicies (including the camera medium)
+            % to the aqueous
             sg.refraction = [];
-            sg.eye.pupil.eccenFcnString = '@(x) 0';
-            sg.eye.iris.thickness = 0;
+            sg.eye.stop.eccenFcnString = '@(x) 0';
         case 3
-            sg = createSceneGeometry('sphericalAmetropia',sphericalAmetropia,'spectralDomain','vis');
-            sg.eye.pupil.eccenFcnString = '@(x) 0';
+            % Cornea only. This is Fedtke with our cornea model.
+            fa = [0 0];
+            sg.eye.stop.eccenFcnString = '@(x) 0';
         case 4
-            sg = createSceneGeometry('sphericalAmetropia',sphericalAmetropia,'spectralDomain','vis');
-            sg.eye.iris.thickness = 0;
+            sg.eye.stop.eccenFcnString = '@(x) 0';
         case 5
-            sg = createSceneGeometry('sphericalAmetropia',sphericalAmetropia,'spectralDomain','vis');
+            % No changes. Full model.
     end
     for vv = 1:length(viewingAngleDeg)
-        [diamRatios(modelLevel,vv), C(modelLevel,vv), pupilFitError(modelLevel,vv), thetas(modelLevel,vv), horizPixels(modelLevel,vv), vertPixels(modelLevel,vv) ] = returnPupilDiameterRatio_CameraMoves(viewingAngleDeg(vv),actualPupilDiam,sg);
+        [diamRatios(modelLevel,vv), C(modelLevel,vv), pupilFitError(modelLevel,vv), thetas(modelLevel,vv), horizPixels(modelLevel,vv), vertPixels(modelLevel,vv) ] = returnPupilDiameterRatio_CameraMoves(viewingAngleDeg(vv),fa,stopDiam,sg);
     end
 end
 
@@ -114,7 +119,7 @@ fedtkeFit = fit (fedtkeFig9Data(1,:)',fedtkeFig9Data(2,:)',mathurEq7Fedtke,'Star
 % Plot the results.
 figHandle1 = figure();
 
-titleStrings = {'no model','add alpha','add ray trace','add non-circular pupil aperture','cornea only'};
+titleStrings = {'no model','add alpha','cornea only','add ray trace','add non-circular pupil aperture'};
 for modelLevel = 1:nModels
     subplot(3,2,modelLevel);
     hold on
