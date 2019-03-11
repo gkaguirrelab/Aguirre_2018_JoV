@@ -22,9 +22,8 @@ sceneGeometry.eye.rotationCenters.ele = [0 0 0];
 azimuthDeg = (-viewingAngleDeg)-fixationAngles(1);
 elevationDeg = zeros(size(viewingAngleDeg))-fixationAngles(2);
 
-
 % Assemble the eyePose
-eyePose=[azimuthDeg elevationDeg torsionDeg stopDiam/2];
+eyePose=[azimuthDeg elevationDeg 0 stopDiam/2];
 
 % First, perform the forward projection to determine where the center of
 % the entrance pupil is located in the sceneWorld coordinates
