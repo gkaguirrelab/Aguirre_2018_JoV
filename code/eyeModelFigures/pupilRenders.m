@@ -12,22 +12,24 @@ accomodationDiopters = 1000/3000;
 % Define how we'd like the images to look
 sensorResolution=[960 720];
 intrinsicCameraMatrix = [2600 0 480; 0 2600 360; 0 0 1];
+%    'intrinsicCameraMatrix',intrinsicCameraMatrix,'sensorResolution',sensorResolution, ...
 
 sceneGeometry = createSceneGeometry(...
-    'intrinsicCameraMatrix',intrinsicCameraMatrix,'sensorResolution',sensorResolution, ...
     'sphericalAmetropia',sphericalAmetropia,...
     'accommodationDiopeters',accomodationDiopters,...
     'spectralDomain','vis',...
     'calcLandmarkFovea',true);
 
-% Setup the camera position and rotation properties
-sceneGeometry.cameraPosition.translation = [0; 0; 100];
+% Setup the camera position and rotation properties. We position the camera
+% farther away than was used for the measurements to allow the entire model
+% eye to appear within the sensor display.
+sceneGeometry.cameraPosition.translation = [0; 0; 150];
 sceneGeometry.eye.rotationCenters.azi = [0 0 0];
 sceneGeometry.eye.rotationCenters.ele = [0 0 0];
 
 viewingAngleDeg = -65:30:55;
 
-modelEyeLabelNames = {'retina' 'retina_hidden' 'irisPerimeter' 'pupilPerimeter' 'pupilEllipse' 'pupilCenter' 'cornea'};
+modelEyeLabelNames = {'retina' 'retina_hidden' 'irisPerimeter' 'pupilPerimeter' 'pupilEllipse' 'stopCenter' 'cornea'};
 modelEyePlotColors = {'.w' '.w' 'ob' '*g' '-g' '+r' '.y'};
 
 
