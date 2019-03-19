@@ -1,8 +1,5 @@
-function [diamRatio, C, pupilFitError, theta, horizPixels, vertPixels] = returnPupilDiameterRatio_CameraMoves(viewingAngleDeg,fixationAngles,stopDiam,sceneGeometry,torsionDeg)
+function [diamRatio, C, pupilFitError, theta, horizPixels, vertPixels] = returnPupilDiameterRatio_CameraMoves(viewingAngleDeg,fixationAngles,stopDiam,sceneGeometry)
 
-if nargin==3
-    torsionDeg = 0;
-end
 
 % Setup the camera position and rotation properties
 sceneGeometry.cameraPosition.translation = [0; 0; 100];
@@ -21,6 +18,7 @@ sceneGeometry.eye.rotationCenters.ele = [0 0 0];
 % Mathur viewing angle and alpha.
 azimuthDeg = (-viewingAngleDeg)-fixationAngles(1);
 elevationDeg = zeros(size(viewingAngleDeg))-fixationAngles(2);
+
 
 % Assemble the eyePose
 eyePose=[azimuthDeg elevationDeg 0 stopDiam/2];

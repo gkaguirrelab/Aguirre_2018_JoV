@@ -67,7 +67,7 @@ sceneGeometry = createSceneGeometry(...
 [~,~,fixationEyePose]=calcLineOfSightRay(sceneGeometry,stopDiam/2,fixationTargetDistance);
 
 clear diamRatios C
-for modelLevel = 5:nModels
+for modelLevel = 1:nModels
     sg = sceneGeometry;
     fa = fixationEyePose(1:2);
     switch modelLevel
@@ -138,7 +138,11 @@ for modelLevel = 1:nModels
     plot(viewingAngleDeg,diamRatios(modelLevel,:),'-','Color',[1 0 0]);
     plot(viewingAngleDeg,fedtkeFit(viewingAngleDeg),'-g');
     RMSE = sqrt(mean((diamRatios(modelLevel,:)-mathurEq9(viewingAngleDeg)).^2));
+    medianSignedError = median((diamRatios(modelLevel,:)-mathurEq9(viewingAngleDeg)));
+    medianUnsignedError = median(abs((diamRatios(modelLevel,:)-mathurEq9(viewingAngleDeg))));
     text(0,0.6,sprintf('RMSE = %1.0e',RMSE),'HorizontalAlignment','Center');
+    text(0,0.5,sprintf('median signed = %1.0e',medianSignedError),'HorizontalAlignment','Center');
+    text(0,0.4,sprintf('median unsigned = %1.0e',medianUnsignedError),'HorizontalAlignment','Center');
     
     plot(viewingAngleDeg,mathurEq11(viewingAngleDeg),'-','Color',[.5 .5 .5]);
     plot(viewingAngleDeg,viewingAngleDeg.*0,':','Color',[.5 .5 .5]);

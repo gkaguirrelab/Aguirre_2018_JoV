@@ -46,7 +46,13 @@ mathurData = [-4.943273905996759, -0.8298755186722002
 
 
 viewingAngleDeg = -70:1:65;
-exitPupilDiam = 2.6330*2;
+
+% Equivalent to a 6mm diameter pupil
+stopDiam = 2.6484*2;
+
+% Subjects in the Mathur study fixated a point 3 meters away
+fixationTargetDistance = 3000;
+accomodationDiopters = 1000/3000;
 
 % Derive the axial length of the eye for each of several ametropia values
 ametropiaValues = -7:1:7;
@@ -57,14 +63,19 @@ eq7 = fittype( @(beta,D,E,x) D.*cosd((x-beta)./E), 'independent','x','dependent'
 
 betas = [];
 for aa = 1:length(ametropiaValues)
-        % Obtain the turning point for the correct axial length
-        sceneGeometry = createSceneGeometry('sphericalAmetropia',ametropiaValues(aa));
-        for vv = 1:length(viewingAngleDeg)
-            [diamRatio(vv), C(vv), pupilFitError(vv)] = returnPupilDiameterRatio_CameraMoves(viewingAngleDeg(vv),exitPupilDiam,sceneGeometry);
-        end
-        f = fit (viewingAngleDeg',diamRatio',eq7,'StartPoint',[5.3,0.93,1.12]);
-        betas(aa) = f.beta;
-        alphas(aa) = sceneGeometry.eye.axes.visual.degField(1);
+    % Obtain the turning point for the correct axial length
+    sceneGeometry = createSceneGeometry(...
+        'sphericalAmetropia',ametropiaValues(aa),...
+        'accommodationDiopeters',accomodationDiopters,...
+        'spectralDomain','vis',...
+        'calcLandmarkFovea',true);
+    [~,~,fixationEyePose]=calcLineOfSightRay(sceneGeometry,stopDiam/2,fixationTargetDistance);
+    for vv = 1:length(viewingAngleDeg)
+        [diamRatio(vv), C(vv), pupilFitError(vv)] = returnPupilDiameterRatio_CameraMoves(viewingAngleDeg(vv),fixationEyePose(1:2),stopDiam,sceneGeometry);
+    end
+    f = fit (viewingAngleDeg',diamRatio',eq7,'StartPoint',[5.3,0.93,1.12]);
+    betas(aa) = f.beta;
+    alphas(aa) = sceneGeometry.eye.landmarks.fovea.degField(1);
 end
 
 % Plot the mathur data
