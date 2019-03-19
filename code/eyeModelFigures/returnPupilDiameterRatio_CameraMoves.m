@@ -29,7 +29,7 @@ eyePose=[azimuthDeg elevationDeg 0 stopDiam/2];
 % the entrance pupil is located in the sceneWorld coordinates
 % Obtain the center of the entrance pupil for this eye pose.
 [~, ~, worldPoints, ~, ~, pointLabels] = pupilProjection_fwd(eyePose, sceneGeometry, 'nStopPerimPoints', 16);
-pupilCenter = mean(worldPoints(strcmp(pointLabels,'pupilPerimeter'),:));
+pupilCenter = nanmean(worldPoints(strcmp(pointLabels,'pupilPerimeter'),:));
 
 % Adjust the sceneGeometry to translate the camera to be centered on the
 % entrance pupil. This is an attempt to match the arrangement of the Mathur

@@ -38,6 +38,11 @@ entrancePupilDiam = 6;
 %}
 stopDiam = 2.6484*2;
 
+
+% Subjects in the Mathur study fixated a point 3 meters away
+fixationTargetDistance = 3000;
+accomodationDiopters = 1000/3000;
+
 %{
     % Probe the forward model at the estimated pose angles to
     % estimate the pupil radius.
@@ -49,17 +54,22 @@ stopDiam = 2.6484*2;
 %}
 pixelsPerMM = 28.5769;
 
+
+
 nModels = 5;
 
-sceneGeometry = createSceneGeometry('sphericalAmetropia',sphericalAmetropia,'spectralDomain','vis','calcLandmarkFovea',true);
-[outputRayLoS,rayPathLoS]=calcLineOfSightRay(sceneGeometry,stopDiam/2);
-[azimuth, elevation] = quadric.rayToAngles(outputRayLoS);
-fixationAngles = [azimuth, elevation];
+sceneGeometry = createSceneGeometry(...
+    'sphericalAmetropia',sphericalAmetropia,...
+    'accommodationDiopeters',accomodationDiopters,...
+    'spectralDomain','vis',...
+    'calcLandmarkFovea',true);
+
+[~,~,fixationEyePose]=calcLineOfSightRay(sceneGeometry,stopDiam/2,fixationTargetDistance);
 
 clear diamRatios C
-for modelLevel = 1:nModels
+for modelLevel = 5:nModels
     sg = sceneGeometry;
-    fa = fixationAngles;
+    fa = fixationEyePose(1:2);
     switch modelLevel
         case 1
             sg.refraction = [];
