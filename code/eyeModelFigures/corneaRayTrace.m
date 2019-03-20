@@ -4,14 +4,14 @@
 
     sceneGeometry = createSceneGeometry();
     % Define an initial ray
-    p = [sceneGeometry.eye.pupil.center(1); 2; 0];
+    p = [sceneGeometry.eye.stop.center(1); 2; 0];
     u = [1;tand(31);0];
     u = u./sqrt(sum(u.^2));
     inputRay = [p, u];
     % Perform the ray trace
-    [outputRay, rayPath] = rayTraceQuadrics(inputRay, sceneGeometry.refraction.pupilToCamera.opticalSystem);
+    [outputRay, rayPath] = rayTraceQuadrics(inputRay, sceneGeometry.refraction.stopToCamera.opticalSystem);
     % Plot the optical system
-    plotOpticalSystem('surfaceSet',sceneGeometry.refraction.pupilToCamera,...
+    plotOpticalSystem('surfaceSet',sceneGeometry.refraction.stopToCamera,...
         'outputRay',outputRay,'rayPath',rayPath, ...
         'addLighting',true);
     
@@ -19,7 +19,7 @@ for deg = 31:-15:-44
     u = [1;tand(deg);0];
     u = u./sqrt(sum(u.^2));
     inputRay = [p, u];
-    [outputRay, rayPath] = rayTraceQuadrics(inputRay, sceneGeometry.refraction.pupilToCamera.opticalSystem);
+    [outputRay, rayPath] = rayTraceQuadrics(inputRay, sceneGeometry.refraction.stopToCamera.opticalSystem);
     plotOpticalSystem('newFigure',false,...
         'outputRay',outputRay,'rayPath',rayPath,'viewAngle',[0 90]);
     drawnow

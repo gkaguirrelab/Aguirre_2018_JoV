@@ -1,6 +1,6 @@
 %% modelEyeFigure3D
 
-sceneGeometry = createSceneGeometry('sphericalAmetropia',-0.823);
+sceneGeometry = createSceneGeometry('sphericalAmetropia',-0.823,'calcLandmarkFovea',true);
 
 figure;
 
@@ -8,9 +8,9 @@ subplot(2,2,1)
 % Plot the optical system
 plotOpticalSystem('newFigure',false,'surfaceSet',sceneGeometry.refraction.retinaToCamera,'addLighting',true);
 % Define an initial ray arising at the fovea
-p = sceneGeometry.eye.axes.visual.coords';
+p = sceneGeometry.eye.landmarks.fovea.coords';
 % Assemble the ray
-u = [1;tand(sceneGeometry.eye.axes.visual.degField(1));tand(sceneGeometry.eye.axes.visual.degField(2))];
+u = [1;tand(sceneGeometry.eye.landmarks.fovea.degField(1));tand(sceneGeometry.eye.landmarks.fovea.degField(2))];
 u = u./sqrt(sum(u.^2));
 R = [p, u];
 % Perform the ray trace
@@ -30,9 +30,9 @@ subplot(2,2,3)
 % Plot the optical system
 plotOpticalSystem('newFigure',false,'surfaceSet',sceneGeometry.refraction.retinaToCamera,'addLighting',true);
 % Define an initial ray arising at the fovea
-p = sceneGeometry.eye.axes.visual.coords';
+p = sceneGeometry.eye.landmarks.fovea.coords';
 % Assemble the ray
-u = [1;tand(sceneGeometry.eye.axes.visual.degField(1));tand(sceneGeometry.eye.axes.visual.degField(2))];
+u = [1;tand(sceneGeometry.eye.landmarks.fovea.degField(1));tand(sceneGeometry.eye.landmarks.fovea.degField(2))];
 u = u./sqrt(sum(u.^2));
 R = [p, u];
 % Perform the ray trace
@@ -51,9 +51,9 @@ subplot(2,2,[2 4])
 % Plot the optical system
 plotOpticalSystem('newFigure',false,'surfaceSet',sceneGeometry.refraction.retinaToCamera,'addLighting',true);
 % Define an initial ray arising at the fovea
-p = sceneGeometry.eye.axes.visual.coords';
+p = sceneGeometry.eye.landmarks.fovea.coords';
 % Assemble the ray
-u = [1;tand(sceneGeometry.eye.axes.visual.degField(1));tand(sceneGeometry.eye.axes.visual.degField(2))];
+u = [1;tand(sceneGeometry.eye.landmarks.fovea.degField(1));tand(sceneGeometry.eye.landmarks.fovea.degField(2))];
 u = u./sqrt(sum(u.^2));
 R = [p, u];
 % Perform the ray trace

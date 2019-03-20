@@ -6,8 +6,8 @@ modelEyeFigure
 saveThatSucker(get(groot,'CurrentFigure'),'modelEyeFigure.pdf');
 
 %% modelEyeFigure3D
-modelEyeFigure3D
-saveThatSucker(get(groot,'CurrentFigure'),'modelEyeFigure3D.png');
+%modelEyeFigure3D
+%saveThatSucker(get(groot,'CurrentFigure'),'modelEyeFigure3D.png');
 
 %% Ray tracing through the cornea
 corneaRayTrace
