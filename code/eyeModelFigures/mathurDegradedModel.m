@@ -91,7 +91,7 @@ for modelLevel = 1:nModels
             % No changes. Full model.
     end
     for vv = 1:length(viewingAngleDeg)
-        [diamRatios(modelLevel,vv), C(modelLevel,vv), pupilFitError(modelLevel,vv), thetas(modelLevel,vv), horizPixels(modelLevel,vv), vertPixels(modelLevel,vv) ] = returnPupilDiameterRatio_CameraMoves(viewingAngleDeg(vv),fa,stopDiam,sg);
+        [diamRatios(modelLevel,vv), C(modelLevel,vv), pupilFitError(modelLevel,vv), thetas(modelLevel,vv), horizPixels(modelLevel,vv), vertPixels(modelLevel,vv), nNans(modelLevel,vv) ] = returnPupilDiameterRatio_CameraMoves(viewingAngleDeg(vv),fa,stopDiam,sg);
     end
 end
 
@@ -167,7 +167,17 @@ xlabel('Viewing angle [deg]')
 ylabel('Elliptical fit error')
 title(titleStrings{modelLevel})
 
+
+figHandle3 = figure();
+plot(viewingAngleDeg,nNans(nModels,:),'x','Color',[1 0 0]);
+axis square
+xlim([-90 90]);
+ylim([0 8]);
+xlabel('Viewing angle [deg]')
+ylabel('nNans')
+title(titleStrings{modelLevel})
+
 %% Report the parameters of Mathur Eq 7 fit to the model diam ratios
 for modelLevel = 1:nModels
-    f = fit (viewingAngleDeg',diamRatios(modelLevel,:)',mathurEq7,'StartPoint',[5.3,0.93,1.12]);
+    f = fit (viewingAngleDeg',diamRatios(modelLevel,:)',mathurEq7,'StartPoint',[5.3,0.93,1.12])
 end
