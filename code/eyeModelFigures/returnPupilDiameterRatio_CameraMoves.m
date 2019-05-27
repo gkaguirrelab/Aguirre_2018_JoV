@@ -1,4 +1,4 @@
-function [diamRatio, C, pupilFitError, theta, horizPixels, vertPixels, nNans] = returnPupilDiameterRatio_CameraMoves(viewingAngleDeg,fixationAngles,stopDiam,sceneGeometry)
+function [diamRatio, C, pupilFitError, theta, horizPixels, vertPixels, nMissedPerimPoints] = returnPupilBorder(viewingAngleDeg,fixationAngles,stopDiam,sceneGeometry)
 
 
 % Setup the camera position and rotation properties
@@ -37,10 +37,13 @@ adjustedSceneGeometry = sceneGeometry;
 adjustedSceneGeometry.cameraPosition.translation = adjustedSceneGeometry.cameraPosition.translation+pupilCenter';
 
 % Now, measure the pupil diameter ratio
-[pupilEllipseOnImagePlane, imagePoints, ~, ~, ~, ~, ~, pupilFitError] = pupilProjection_fwd(eyePose, adjustedSceneGeometry,'nStopPerimPoints',16);
+[pupilEllipseOnImagePlane, imagePoints, ~, ~, ~, pointLabels, ~, pupilFitError] = ...
+    pupilProjection_fwd(eyePose, adjustedSceneGeometry,'nStopPerimPoints',16, 'replaceReflectedPoints', false);
+ 
+
 theta = pupilEllipseOnImagePlane(5);
 
-nNans = sum(isnan(imagePoints(17:end,1)));
+nMissedPerimPoints = 16-sum(strcmp(pointLabels,'pupilPerimeter'));
 
 p = ellipse_transparent2ex(pupilEllipseOnImagePlane);
 

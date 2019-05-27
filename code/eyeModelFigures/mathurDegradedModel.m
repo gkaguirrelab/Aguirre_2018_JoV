@@ -4,7 +4,7 @@
 % components of the model.
 
 % The range for our plots
-viewingAngleDeg = -70:1:65;
+viewingAngleDeg = -75:1:65;
 
 % The refractive error of the subject for the average Mathur data.
 sphericalAmetropia = (6*1.2-11*2.9)/30;
@@ -91,7 +91,7 @@ for modelLevel = 1:nModels
             % No changes. Full model.
     end
     for vv = 1:length(viewingAngleDeg)
-        [diamRatios(modelLevel,vv), C(modelLevel,vv), pupilFitError(modelLevel,vv), thetas(modelLevel,vv), horizPixels(modelLevel,vv), vertPixels(modelLevel,vv), nNans(modelLevel,vv) ] = returnPupilDiameterRatio_CameraMoves(viewingAngleDeg(vv),fa,stopDiam,sg);
+        [diamRatios(modelLevel,vv), C(modelLevel,vv), pupilFitError(modelLevel,vv), ~, ~, ~, nMissedPerimPoints(modelLevel,vv) ] = returnPupilDiameterRatio_CameraMoves(viewingAngleDeg(vv),fa,stopDiam,sg);
     end
 end
 
@@ -152,6 +152,7 @@ for modelLevel = 1:nModels
     
     pbaspect([1 1.5 1])
     xlim([-90 90]);
+    xticks([-75 -50 -25 0 25 50 75])
     ylim([-.2 1.1]);
     xlabel('Viewing angle [deg]')
     ylabel('Pupil Diameter Ratio / obliquity')
@@ -160,22 +161,17 @@ end
 
 figHandle2 = figure();
 plot(viewingAngleDeg,pupilFitError(nModels,:)./pixelsPerMM,'-','Color',[1 0 0]);
+% hold on
+% plot(viewingAngleDeg(nMissedPerimPoints(nModels,:)>0),pupilFitError(nModels,(nMissedPerimPoints(nModels,:)>0))./pixelsPerMM,'*','Color',[1 0 0]);
 axis square
 xlim([-90 90]);
+xticks([-75 -50 -25 0 25 50 75])
 ylim([0 0.05]);
 xlabel('Viewing angle [deg]')
 ylabel('Elliptical fit error')
 title(titleStrings{modelLevel})
 
 
-figHandle3 = figure();
-plot(viewingAngleDeg,nNans(nModels,:),'x','Color',[1 0 0]);
-axis square
-xlim([-90 90]);
-ylim([0 8]);
-xlabel('Viewing angle [deg]')
-ylabel('nNans')
-title(titleStrings{modelLevel})
 
 %% Report the parameters of Mathur Eq 7 fit to the model diam ratios
 for modelLevel = 1:nModels
