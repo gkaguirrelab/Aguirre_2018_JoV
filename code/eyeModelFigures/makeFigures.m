@@ -17,6 +17,7 @@ saveThatSucker(get(groot,'CurrentFigure'),'corneaRayTrace.pdf');
 mathurDegradedModel
 saveThatSucker(figHandle1,'mathurDegradedModel.pdf');
 saveThatSucker(figHandle2,'ellipseFitError.pdf');
+saveThatSucker(figHandle3,'missedPerimeterPoints.pdf');
 
 %% turningPointByAmetropia
 turningPointByAmetropia

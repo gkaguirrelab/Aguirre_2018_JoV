@@ -4,7 +4,8 @@
 % components of the model.
 
 % The range for our plots
-viewingAngleDeg = -75:1:65;
+%viewingAngleDeg = -75:1:65;
+viewingAngleDeg = -80:1:70;
 
 % The refractive error of the subject for the average Mathur data.
 sphericalAmetropia = (6*1.2-11*2.9)/30;
@@ -67,7 +68,7 @@ sceneGeometry = createSceneGeometry(...
 [~,~,fixationEyePose]=calcLineOfSightRay(sceneGeometry,stopDiam/2,fixationTargetDistance);
 
 clear diamRatios C
-for modelLevel = 1:nModels
+for modelLevel = 5:nModels
     sg = sceneGeometry;
     fa = fixationEyePose(1:2);
     switch modelLevel
@@ -161,16 +162,24 @@ end
 
 figHandle2 = figure();
 plot(viewingAngleDeg,pupilFitError(nModels,:)./pixelsPerMM,'-','Color',[1 0 0]);
-% hold on
-% plot(viewingAngleDeg(nMissedPerimPoints(nModels,:)>0),pupilFitError(nModels,(nMissedPerimPoints(nModels,:)>0))./pixelsPerMM,'*','Color',[1 0 0]);
 axis square
 xlim([-90 90]);
 xticks([-75 -50 -25 0 25 50 75])
 ylim([0 0.05]);
 xlabel('Viewing angle [deg]')
 ylabel('Elliptical fit error')
-title(titleStrings{modelLevel})
+title('Ellipse Fit error')
 
+
+figHandle3 = figure();
+plot(viewingAngleDeg,nMissedPerimPoints(nModels,:),'.','Color',[1 0 0]);
+axis square
+xlim([-90 90]);
+xticks([-80 -75 -50 -25 0 25 50 75 80])
+ylim([0 10]);
+xlabel('Viewing angle [deg]')
+ylabel('Missed perimeter points')
+title('Missed perimeter points')
 
 
 %% Report the parameters of Mathur Eq 7 fit to the model diam ratios
